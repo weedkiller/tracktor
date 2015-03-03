@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.web", "tracktor.web\tracktor.web.csproj", "{FC2F8E40-2CDE-4C02-9C0B-A28CC4CD8947}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.model", "tracktor.model\tracktor.model.csproj", "{E91E94C0-7583-4F9D-A4ED-30871CDA3CB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.host", "tracktor.host\tracktor.host.csproj", "{8F03A868-5E76-4845-824A-154461AEE053}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.service", "tracktor.service\tracktor.service.csproj", "{6F323616-0F43-4325-966F-C78EAC9DDB74}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC2F8E40-2CDE-4C02-9C0B-A28CC4CD8947}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC2F8E40-2CDE-4C02-9C0B-A28CC4CD8947}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC2F8E40-2CDE-4C02-9C0B-A28CC4CD8947}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC2F8E40-2CDE-4C02-9C0B-A28CC4CD8947}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E91E94C0-7583-4F9D-A4ED-30871CDA3CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E91E94C0-7583-4F9D-A4ED-30871CDA3CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E91E94C0-7583-4F9D-A4ED-30871CDA3CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E91E94C0-7583-4F9D-A4ED-30871CDA3CB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F03A868-5E76-4845-824A-154461AEE053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F03A868-5E76-4845-824A-154461AEE053}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F03A868-5E76-4845-824A-154461AEE053}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F03A868-5E76-4845-824A-154461AEE053}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F323616-0F43-4325-966F-C78EAC9DDB74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F323616-0F43-4325-966F-C78EAC9DDB74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F323616-0F43-4325-966F-C78EAC9DDB74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F323616-0F43-4325-966F-C78EAC9DDB74}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
