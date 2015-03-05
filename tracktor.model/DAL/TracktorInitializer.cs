@@ -45,7 +45,7 @@ namespace tracktor.model.DAL
                 new TEntry { StartDate = now.AddHours(-21), EndDate = now.AddHours(-18).AddMinutes(-22), TTaskID = tasks[2].TTaskID },
                 new TEntry { StartDate = now.AddDays(-2).AddHours(-15).AddMinutes(-1), EndDate = now.AddDays(-2).AddHours(-14), TTaskID = tasks[3].TTaskID },
                 new TEntry { StartDate = now.AddHours(-10).AddMinutes(33), EndDate = now.AddHours(-8), TTaskID = tasks[4].TTaskID },
-                new TEntry { StartDate = now.AddHours(-5).AddMinutes(-17), EndDate = now.AddHours(-5).AddHours(-14), TTaskID = tasks[5].TTaskID },
+                new TEntry { StartDate = now.AddHours(-5).AddMinutes(-17), EndDate = now.AddHours(-5).AddMinutes(-14), TTaskID = tasks[5].TTaskID },
                 new TEntry { StartDate = now.AddDays(-40).AddHours(-15).AddMinutes(-1), EndDate = now.AddDays(-39).AddHours(-1), TTaskID = tasks[7].TTaskID },
             };
             entries.ForEach(e => context.TEntries.Add(e));

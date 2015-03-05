@@ -7,9 +7,9 @@ using tracktor.model.DAL;
 
 namespace tracktor.service
 {
-    public static class TracktorStartup
+    public class TracktorStartup
     {
-        public static void Initialize()
+        public static void AppInitialize()
         {
             Mapper.CreateMap<TProject, TProjectDto>();
             Mapper.CreateMap<TTask, TTaskDto>();
