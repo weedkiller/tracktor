@@ -23,12 +23,18 @@ namespace tracktor.service
         {
             try
             {
+                TModelDto model = null;
                 using (var db = new TracktorContext())
                 {
-                    return new TModelDto {
+                    model = new TModelDto {
                         Projects = db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
                     };
                 }
+                using (var calc = new TracktorCalculator(context))
+                {
+                    calc.CalculateContribs(null, calc.DateOrLocalNow(null), model);
+                }
+                return model;
             }
             catch (Exception ex)
             {

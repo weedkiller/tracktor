@@ -46,5 +46,19 @@ namespace tracktor.service
                 TaskContribs[taskId] += amount;
             }
         }
+
+        protected double GetTotalContribBetween(DateTime startDate, DateTime endDate)
+        {
+            return DayContribs.Where(d => d.Key >= startDate && d.Key <= endDate).Sum(c => c.Value);
+        }
+
+        public TContribDto GetContrib()
+        {
+            return new TContribDto() {
+                Today = GetTotalContribBetween(EndDate, EndDate),
+                ThisWeek = GetTotalContribBetween(EndDate.StartOfWeek(DayOfWeek.Monday), EndDate),
+                ThisMonth = GetTotalContribBetween(new DateTime(EndDate.Year, EndDate.Month, 1), EndDate),
+            };
+        }
     }
 }

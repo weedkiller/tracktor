@@ -17,6 +17,17 @@ namespace tracktor.service
     }
 
     [DataContract]
+    public struct TContribDto
+    {
+        [DataMember]
+        public double Today { get; set; }
+        [DataMember]
+        public double ThisWeek { get; set; }
+        [DataMember]
+        public double ThisMonth { get; set; }
+    }
+
+    [DataContract]
     public class TModelDto
     {
         [DataMember]
@@ -33,7 +44,7 @@ namespace tracktor.service
         [DataMember]
         public DateTime? EndDate { get; set; }
         [DataMember]
-        public decimal Contrib { get; set; }
+        public double Contrib { get; set; }
     }
 
     [DataContract]
@@ -49,6 +60,8 @@ namespace tracktor.service
         public int DisplayOrder { get; set; }
         [DataMember]
         public bool IsObsolete { get; set; }
+        [DataMember]
+        public TContribDto Contrib { get; set; }
     }
 
     [DataContract]

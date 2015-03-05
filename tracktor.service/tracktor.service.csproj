@@ -79,6 +79,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateUtils.cs" />
     <Compile Include="TracktorCalculator.cs" />
     <Compile Include="TracktorDto.cs" />
     <Compile Include="TracktorReport.cs" />

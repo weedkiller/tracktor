@@ -22,7 +22,7 @@ namespace tracktor.service
 
         public DateTime DateOrLocalNow(DateTime? inputDate)
         {
-            if(!inputDate.HasValue)
+            if (!inputDate.HasValue)
             {
                 return ToLocal(DateTime.UtcNow).Value;
             }
@@ -30,8 +30,8 @@ namespace tracktor.service
         }
 
         protected DateTime? ToUtc(DateTime? inputDate)
-        {            
-            if(inputDate.HasValue)
+        {
+            if (inputDate.HasValue)
             {
                 Debug.Assert(inputDate.Value.Kind != DateTimeKind.Utc, "Input Date is already UTC!");
                 return new DateTime(inputDate.Value.Ticks, DateTimeKind.Utc).AddMinutes(mContext.UTCOffset);
@@ -91,11 +91,39 @@ namespace tracktor.service
 
             List<TEntry> entries = GetEntries(startDate, endDate, projectID);
             var report = new TracktorReport(startDate, endDate);
-            foreach(var entry in entries)
+            foreach (var entry in entries)
             {
                 BucketEntry(entry, report);
             }
             return report;
+        }
+
+        public void CalculateContribs(DateTime? startDate, DateTime endDate, TModelDto model)
+        {
+            Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
+            Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
+            var taskToProject = model.Projects.SelectMany(p => p.TTasks.Select(t => new KeyValuePair<int, int>(t.TTaskID, t.TProjectID))).ToDictionary(t => t.Key, p => p.Value);
+            List<TEntry> entries = GetEntries(startDate, endDate, 0);
+            foreach (var taskEntry in entries.GroupBy(e => e.TTaskID))
+            {
+                if (taskToProject.ContainsKey(taskEntry.Key))
+                {
+                    var projectDto = model.Projects.SingleOrDefault(p => p.TProjectID == taskToProject[taskEntry.Key]);
+                    if (projectDto != null)
+                    {
+                        var taskDto = projectDto.TTasks.SingleOrDefault(t => t.TTaskID == taskEntry.Key);
+                        if (taskDto != null)
+                        {
+                            var report = new TracktorReport(startDate, endDate);
+                            foreach (var entry in taskEntry)
+                            {
+                                BucketEntry(entry, report);
+                            }
+                            taskDto.Contrib = report.GetContrib();
+                        }
+                    }
+                }
+            }
         }
 
         #region IDisposable Members

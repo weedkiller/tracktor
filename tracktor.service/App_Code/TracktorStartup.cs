@@ -12,8 +12,8 @@ namespace tracktor.service
         public static void AppInitialize()
         {
             Mapper.CreateMap<TProject, TProjectDto>();
-            Mapper.CreateMap<TTask, TTaskDto>();
-            Mapper.CreateMap<TEntry, TEntryDto>().AfterMap((src, dst) => dst.Contrib = (decimal)(((src.EndDate.HasValue ? src.EndDate.Value : DateTime.UtcNow) - src.StartDate).TotalSeconds));
+            Mapper.CreateMap<TTask, TTaskDto>().AfterMap((src, dst) => dst.Contrib = new TContribDto { Today = 0, ThisWeek = 0, ThisMonth = 0 });
+            Mapper.CreateMap<TEntry, TEntryDto>().AfterMap((src, dst) => dst.Contrib = ((src.EndDate.HasValue ? src.EndDate.Value : DateTime.UtcNow) - src.StartDate).TotalSeconds);
 
             Mapper.CreateMap<TracktorReport, TracktorReportDto>();
         }
