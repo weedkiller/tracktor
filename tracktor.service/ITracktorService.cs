@@ -11,27 +11,30 @@ namespace tracktor.service
     public interface ITracktorService
     {
         [OperationContract]
-        CModel GetModel(CContext context);
+        TModelDto GetModel(TContextDto context);
 
         [OperationContract]
-        TTaskDto UpdateTask(CContext context, TTaskDto task);
+        TTaskDto UpdateTask(TContextDto context, TTaskDto task);
 
         [OperationContract]
-        TProjectDto UpdateProject(CContext context, TProjectDto project);
+        TProjectDto UpdateProject(TContextDto context, TProjectDto project);
 
         [OperationContract]
-        TEntryDto UpdateEntry(CContext context, TEntryDto entry);
+        TEntryDto UpdateEntry(TContextDto context, TEntryDto entry);
 
         [OperationContract]
-        List<TEntryDto> GetEntries(CContext context, DateTime? startDate, DateTime endDate, int projectID, int maxEntries);
+        List<TEntryDto> GetEntries(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int maxEntries);
 
         [OperationContract]
-        TracktorReportDto GetReport(CContext context, DateTime? startDate, DateTime endDate, int projectID);
+        TracktorReportDto GetReport(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID);
 
         [OperationContract]
-        TEntryDto StopTask(CContext context, int taskID);
+        TModelDto StopTask(TContextDto context, int currentTaskID);
 
         [OperationContract]
-        bool StartTask(CContext context, int taskID);
+        TModelDto StartTask(TContextDto context, int newTaskID);
+
+        [OperationContract]
+        TModelDto SwitchTask(TContextDto context, int currentTaskID, int newTaskId);
     }
 }

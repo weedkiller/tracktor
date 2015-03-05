@@ -38,14 +38,15 @@ namespace tracktor.model.DAL
             tasks.ForEach(t => context.TTasks.Add(t));
             context.SaveChanges();
 
+            var now = DateTime.UtcNow;
             var entries = new List<TEntry>
             {
-                new TEntry { StartDate = DateTime.Now.AddHours(-24), EndDate = DateTime.Now.AddHours(-22), TTaskID = tasks[0].TTaskID },
-                new TEntry { StartDate = DateTime.Now.AddHours(-21), EndDate = DateTime.Now.AddHours(-18).AddMinutes(-22), TTaskID = tasks[2].TTaskID },
-                new TEntry { StartDate = DateTime.Now.AddDays(-2).AddHours(-15).AddMinutes(-1), EndDate = DateTime.Now.AddDays(-2).AddHours(-14), TTaskID = tasks[3].TTaskID },
-                new TEntry { StartDate = DateTime.Now.AddHours(-10).AddMinutes(33), EndDate = DateTime.Now.AddHours(-8), TTaskID = tasks[4].TTaskID },
-                new TEntry { StartDate = DateTime.Now.AddHours(-5).AddMinutes(-17), EndDate = DateTime.Now.AddHours(-5).AddHours(-14), TTaskID = tasks[5].TTaskID },
-                new TEntry { StartDate = DateTime.Now.AddDays(-40).AddHours(-15).AddMinutes(-1), EndDate = DateTime.Now.AddDays(-39).AddHours(-1), TTaskID = tasks[7].TTaskID },
+                new TEntry { StartDate = now.AddHours(-24), EndDate = now.AddHours(-22), TTaskID = tasks[0].TTaskID },
+                new TEntry { StartDate = now.AddHours(-21), EndDate = now.AddHours(-18).AddMinutes(-22), TTaskID = tasks[2].TTaskID },
+                new TEntry { StartDate = now.AddDays(-2).AddHours(-15).AddMinutes(-1), EndDate = now.AddDays(-2).AddHours(-14), TTaskID = tasks[3].TTaskID },
+                new TEntry { StartDate = now.AddHours(-10).AddMinutes(33), EndDate = now.AddHours(-8), TTaskID = tasks[4].TTaskID },
+                new TEntry { StartDate = now.AddHours(-5).AddMinutes(-17), EndDate = now.AddHours(-5).AddHours(-14), TTaskID = tasks[5].TTaskID },
+                new TEntry { StartDate = now.AddDays(-40).AddHours(-15).AddMinutes(-1), EndDate = now.AddDays(-39).AddHours(-1), TTaskID = tasks[7].TTaskID },
             };
             entries.ForEach(e => context.TEntries.Add(e));
             context.SaveChanges();

@@ -8,6 +8,22 @@ using System.Threading.Tasks;
 namespace tracktor.service
 {
     [DataContract]
+    public class TContextDto
+    {
+        [DataMember]
+        public int TUserID { get; set; }
+        [DataMember]
+        public int UTCOffset { get; set; }
+    }
+
+    [DataContract]
+    public class TModelDto
+    {
+        [DataMember]
+        public List<TProjectDto> Projects { get; set; }
+    }
+
+    [DataContract]
     public class TEntryDto
     {
         [DataMember]

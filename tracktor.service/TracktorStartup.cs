@@ -13,7 +13,7 @@ namespace tracktor.service
         {
             Mapper.CreateMap<TProject, TProjectDto>();
             Mapper.CreateMap<TTask, TTaskDto>();
-            Mapper.CreateMap<TEntry, TEntryDto>();
+            Mapper.CreateMap<TEntry, TEntryDto>().AfterMap((src, dst) => dst.Contrib = (decimal)(((src.EndDate.HasValue ? src.EndDate.Value : DateTime.UtcNow) - src.StartDate).TotalSeconds));
 
             Mapper.CreateMap<TracktorReport, TracktorReportDto>();
         }

@@ -3,30 +3,161 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.ServiceModel.Web;
 using System.Text;
 using tracktor.model.DAL;
 
 namespace tracktor.service
 {
-    [ServiceBehavior(InstanceContextMode=InstanceContextMode.PerCall)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class TracktorService : ITracktorService, IDisposable
     {
         private TracktorContext _db = new TracktorContext();
 
-        public CModel GetModel(CContext context)
+        #region ITracktorService
+
+        public TModelDto GetModel(TContextDto context)
         {
-            using (var db = new TracktorContext())
+            try
             {
-                return new CModel
+                using (var db = new TracktorContext())
                 {
-                    Projects = db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
-                };
+                    return new TModelDto {
+                        Projects = db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
             }
         }
 
-        public D UpdateObject<D, T>(CContext context, D dto, DbSet<T> dbSet, Func<D, int> dtoID, Func<T, int> tID) where D : new() where T : class, new()
+        public TTaskDto UpdateTask(TContextDto context, TTaskDto task)
+        {
+            try
+            {
+                return UpdateObject<TTaskDto, TTask>(context, task, _db.TTasks, (d => d.TTaskID), (t => t.TTaskID));
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TProjectDto UpdateProject(TContextDto context, TProjectDto project)
+        {
+            try
+            {
+                return UpdateObject<TProjectDto, TProject>(context, project, _db.TProjects, (d => d.TProjectID), (t => t.TProjectID));
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TEntryDto UpdateEntry(TContextDto context, TEntryDto entry)
+        {
+            try
+            {
+                return UpdateObject<TEntryDto, TEntry>(context, entry, _db.TEntries, (d => d.TEntryID), (t => t.TEntryID));
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public List<TEntryDto> GetEntries(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int maxEntries)
+        {
+            try
+            {
+                using (var calculator = new TracktorCalculator(context))
+                {
+                    return calculator.GetEntries(startDate, calculator.DateOrLocalNow(endDate), projectID, maxEntries).Select(e => Mapper.Map<TEntryDto>(e)).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TracktorReportDto GetReport(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID)
+        {
+            try
+            {
+                using (var calculator = new TracktorCalculator(context))
+                {
+                    return Mapper.Map<TracktorReportDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TModelDto StopTask(TContextDto context, int currentTaskID)
+        {
+            try
+            {
+                using (var states = new TracktorStates(context))
+                {
+                    states.Stop(currentTaskID);
+                }
+                return GetModel(context);
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TModelDto StartTask(TContextDto context, int newTaskID)
+        {
+            try
+            {
+                using (var states = new TracktorStates(context))
+                {
+                    states.Start(newTaskID);
+                }
+                return GetModel(context);
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TModelDto SwitchTask(TContextDto context, int currentTaskID, int newTaskID)
+        {
+            try
+            {
+                using (var states = new TracktorStates(context))
+                {
+                    states.Stop(currentTaskID);
+                    states.Start(newTaskID);
+                }
+                return GetModel(context);
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        protected D UpdateObject<D, T>(TContextDto context, D dto, DbSet<T> dbSet, Func<D, int> dtoID, Func<T, int> tID)
+            where D : new()
+            where T : class, new()
         {
             var storedObject = dbSet.SingleOrDefault(t => tID(t) == dtoID(dto));
             if (storedObject == null)
@@ -47,13 +178,13 @@ namespace tracktor.service
             return Mapper.Map<D>(storedObject);
         }
 
-        protected bool IsAllowed(CContext context, object storedObject)
+        protected bool IsAllowed(TContextDto context, object storedObject)
         {
-            if(storedObject is TEntry)
+            if (storedObject is TEntry)
             {
                 return IsAllowed(context, (storedObject as TEntry).TTask);
             }
-            else if(storedObject is TTask)
+            else if (storedObject is TTask)
             {
                 return IsAllowed(context, (storedObject as TTask).TProject);
             }
@@ -67,46 +198,7 @@ namespace tracktor.service
             }
         }
 
-        public TTaskDto UpdateTask(CContext context, TTaskDto task)
-        {
-            return UpdateObject<TTaskDto, TTask>(context, task, _db.TTasks, (d => d.TTaskID), (t => t.TTaskID));
-        }
-
-        public TProjectDto UpdateProject(CContext context, TProjectDto project)
-        {
-            return UpdateObject<TProjectDto, TProject>(context, project, _db.TProjects, (d => d.TProjectID), (t => t.TProjectID));
-        }
-
-        public TEntryDto UpdateEntry(CContext context, TEntryDto entry)
-        {
-            return UpdateObject<TEntryDto, TEntry>(context, entry, _db.TEntries, (d => d.TEntryID), (t => t.TEntryID));
-        }
-
-        public List<TEntryDto> GetEntries(CContext context, DateTime? startDate, DateTime endDate, int projectID, int maxEntries)
-        {
-            using(var calculator = new TracktorCalculator(context))
-            {
-                return calculator.GetEntries(startDate, endDate, projectID, maxEntries).Select(e => Mapper.Map<TEntryDto>(e)).ToList();
-            }
-        }
-
-        public TracktorReportDto GetReport(CContext context, DateTime? startDate, DateTime endDate, int projectID)
-        {
-            using (var calculator = new TracktorCalculator(context))
-            {
-                return Mapper.Map<TracktorReportDto>(calculator.GetReport(startDate, endDate, projectID));
-            }
-        }
-
-        public TEntryDto StopTask(CContext context, int taskID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool StartTask(CContext context, int taskID)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
 
         #region IDisposable Members
 
@@ -118,9 +210,9 @@ namespace tracktor.service
 
         protected virtual void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
-                if(_db != null)
+                if (_db != null)
                 {
                     _db.Dispose();
                     _db = null;
