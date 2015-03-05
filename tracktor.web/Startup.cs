@@ -1,8 +1,12 @@
-﻿using Microsoft.Owin;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(tracktor.Startup))]
-namespace tracktor
+[assembly: OwinStartup(typeof(tracktor.web.Startup))]
+
+namespace tracktor.web
 {
     public partial class Startup
     {

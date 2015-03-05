@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using tracktor.model;
 using tracktor.model.DAL;
 
 namespace tracktor.service
@@ -19,17 +20,29 @@ namespace tracktor.service
 
         #region ITracktorService
 
+        public int CreateUser(string userName)
+        {
+            try
+            {
+                var newUser = new TUser { Name = userName, LastTaskID = 0, CurrentState = TState.Idle };
+                _db.TUsers.Add(newUser);
+                _db.SaveChanges();
+                return newUser.TUserID;
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
         public TModelDto GetModel(TContextDto context)
         {
             try
             {
                 TModelDto model = null;
-                using (var db = new TracktorContext())
-                {
-                    model = new TModelDto {
-                        Projects = db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
-                    };
-                }
+                model = new TModelDto {
+                    Projects = _db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
+                };
                 using (var calc = new TracktorCalculator(context))
                 {
                     calc.CalculateContribs(null, calc.DateOrLocalNow(null), model);

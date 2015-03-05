@@ -12,7 +12,6 @@ namespace tracktor.model.DAL
     {
         public int TUserID { get; set; }
         public string Name { get; set; }
-        public string AspNetId { get; set; }
 
         public TState CurrentState { get; set; }
         public int LastTaskID { get; set; }

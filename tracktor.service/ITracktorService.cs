@@ -4,12 +4,16 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using tracktor.model;
 
 namespace tracktor.service
 {
     [ServiceContract]
     public interface ITracktorService
     {
+        [OperationContract]
+        int CreateUser(string userName);
+
         [OperationContract]
         TModelDto GetModel(TContextDto context);
 

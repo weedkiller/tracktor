@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace tracktor
+namespace tracktor.web
 {
     public class FilterConfig
     {

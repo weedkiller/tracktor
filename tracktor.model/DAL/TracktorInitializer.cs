@@ -10,7 +10,7 @@ namespace tracktor.model.DAL
     {
         protected override void Seed(TracktorContext context)
         {
-            var user = new TUser { Name = "guest", AspNetId = null };
+            var user = new TUser { Name = "guest" /*, AspNetId = null*/ };
             context.TUsers.Add(user);
             context.SaveChanges();
 
