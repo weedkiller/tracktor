@@ -57,6 +57,26 @@ var projectMapping = function (data) {
     };
 };
 
+var startTask = function (taskId: number) {
+    requestData("/api/Tracktor/StartTask", "POST", {
+        newTaskID: taskId
+    }, updateHomeModel);
+}
+
+var switchTask = function (taskId: number) {
+    requestData("/api/Tracktor/SwitchTask", "POST", {
+        currentTaskID: viewModel.TTaskInProgress.TTaskID,
+        newTaskID: taskId
+    }, updateHomeModel);
+}
+
+var stopTask = function (taskId: number) {
+    /*alert("Stop " + taskId);*/
+    requestData("/api/Tracktor/StopTask", "POST", {
+        currentTaskID: taskId
+    }, updateHomeModel);
+}
+
 var rootModel = function (data) {
     ko.mapping.fromJS(data, rootMapping, this)
 };
@@ -98,16 +118,15 @@ var bindHomeModel = function (data) {
     upup();
 };
 
-var updateHomeModel = function () {
-    requestData("api/Tracktor/GetModel", bindHomeModel);
+var updateHomeModel = function (data) {
+    ko.mapping.fromJS(data, rootMapping, viewModel);
 };
 
-/*var startTask = function (taskId: number) {
-    alert(taskId);
-};*/
+var refreshModel = function () {
+    requestData("api/Tracktor/GetModel", "GET", {}, bindHomeModel);
+};
 
-var requestData = function (url: string, callback: (any) => void)
-{
+var requestData = function (url: string, method: string, data: any, callback: (any) => void) {
     var tokenKey = "TokenKey";
     var token = sessionStorage.getItem(tokenKey);
 
@@ -120,8 +139,9 @@ var requestData = function (url: string, callback: (any) => void)
     };
 
     var settings: JQueryAjaxSettings = {
-        type: "GET",
+        type: method,
         url: url,
+        data: data,
         headers: headers
     };
 

@@ -36,6 +36,12 @@ namespace tracktor.service
 
         [DataMember]
         public List<TEntryDto> Entries { get; set; }
+
+        [DataMember]
+        public bool InProgress { get; set; }
+
+        [DataMember]
+        public TTaskDto TTaskInProgress {  get; set; }
     }
 
     [DataContract]

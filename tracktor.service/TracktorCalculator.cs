@@ -135,6 +135,8 @@ namespace tracktor.service
                                         entryDto.InProgress = true;
                                         taskDto.InProgress = true;
                                         projectDto.InProgress = true;
+                                        model.InProgress = true;
+                                        model.TTaskInProgress = taskDto;
                                     }
                                 }
                             }
@@ -142,6 +144,14 @@ namespace tracktor.service
                         }
                     }
                 }
+            }
+
+            // dummy object for UI binding
+            if(!model.InProgress)
+            {
+                model.TTaskInProgress = new TTaskDto {
+                     TTaskID = 0
+                };
             }
         }
 

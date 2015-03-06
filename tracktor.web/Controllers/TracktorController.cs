@@ -12,6 +12,12 @@ using tracktor.service;
 
 namespace tracktor.web.Controllers
 {
+    public class TracktorEntryAction
+    {
+        public int currentTaskID {  get; set; }
+        public int newTaskID { get; set; }
+    }
+
     [Authorize]
     public class TracktorController : ApiController
     {
@@ -35,51 +41,60 @@ namespace tracktor.web.Controllers
             }
         }
 
+        [HttpGet]
         public TModelDto GetModel()
         {
             return _service.GetModel(Context);
         }
 
+        [HttpPost]
         public TTaskDto UpdateTask(TTaskDto task)
         {
             return _service.UpdateTask(Context, task);
         }
 
+        [HttpPost]
         public TProjectDto UpdateProject(TProjectDto project)
         {
             return _service.UpdateProject(Context, project);
         }
 
+        [HttpPost]
         public TEntryDto UpdateEntry(TEntryDto entry)
         {
             return _service.UpdateEntry(Context, entry);
         }
 
+        [HttpGet]
         public List<TEntryDto> GetEntries(DateTime? startDate, DateTime? endDate, int projectID, int maxEntries)
         {
             return _service.GetEntries(Context, startDate, endDate, projectID, maxEntries);
         }
 
+        [HttpGet]
         public TracktorReportDto GetReport(DateTime? startDate, DateTime? endDate, int projectID)
         {
             return _service.GetReport(Context, startDate, endDate, projectID);
         }
 
-        public TModelDto StopTask(int currentTaskID)
+        [HttpPost]
+        public TModelDto StopTask(TracktorEntryAction actionModel)
         {
-            _service.StopTask(Context, currentTaskID);
+            _service.StopTask(Context, actionModel.currentTaskID);
             return _service.GetModel(Context);
         }
 
-        public TModelDto StartTask(int newTaskID)
+        [HttpPost]
+        public TModelDto StartTask(TracktorEntryAction actionModel)
         {
-            _service.StartTask(Context, newTaskID);
+            _service.StartTask(Context, actionModel.newTaskID);
             return _service.GetModel(Context);
         }
 
-        public TModelDto SwitchTask(int currentTaskID, int newTaskId)
+        [HttpPost]
+        public TModelDto SwitchTask(TracktorEntryAction actionModel)
         {
-            _service.SwitchTask(Context, currentTaskID, newTaskId);
+            _service.SwitchTask(Context, actionModel.currentTaskID, actionModel.newTaskID);
             return _service.GetModel(Context);
         }
 

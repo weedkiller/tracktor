@@ -21,7 +21,7 @@
             <tr class="active">
                 <td data-bind="text: Name"></td>
                 <td>@*<button class="btn btn-default btn-xs" onclick="newTask(@project.ProjectId);">+</button>*@</td>
-                <td class="center"><span data-bind="if: InProgress">Contrib</span></td>
+                <td class="center"><span data-bind="if: InProgress">Active</span></td>
                 <td class="center"><span data-bind="text: timeSpan(Contrib.Today())"></span></td>
                 <td class="center"><span data-bind="text: timeSpan(Contrib.ThisWeek())"></span></td>
                 <td class="center"><span data-bind="text: timeSpan(Contrib.ThisMonth())"></span></td>
@@ -31,21 +31,21 @@
             <tr data-bind="css: { success: InProgress }">
                 <td>&nbsp;</td>
                 <td data-bind="text: Name"></td>
-                <td class="center"><span data-bind="if: InProgress">Contrib</span></td>
+                <td class="center"><span data-bind="if: InProgress">Active</span></td>
                 <td class="center"><span data-bind="text: timeSpan(Contrib.Today())"></span></td>
                 <td class="center"><span data-bind="text: timeSpan(Contrib.ThisWeek())"></span></td>
                 <td class="center"><span data-bind="text: timeSpan(Contrib.ThisMonth())"></span></td>
                 <td class="center">
                     <span data-bind="if: InProgress">
-                        <input type="submit" value="Stop" class="btn btn-xs btn-danger" />
+                        <input type="submit" value="Stop" class="btn btn-xs btn-danger summarybutton" data-bind="click: stopTask.bind($data, TTaskID())" />
                     </span>
                     <span data-bind="ifnot: InProgress">
                         <input data-bind="value: TTaskID" type="hidden" name="tTaskId" />
-                        <!-- ko if: $parent.InProgress -->
-                        <input type="submit" value="Switch" class="btn btn-xs btn-success" />
+                        <!-- ko if: $root.InProgress -->
+                        <input type="submit" value="Switch" class="btn btn-xs btn-success summarybutton" data-bind="click: switchTask.bind($data, TTaskID())" />
                         <!-- /ko -->
-                        <!-- ko ifnot: $parent.InProgress -->
-                        <input type="submit" value="Start" class="btn btn-primary btn-xs btn-success" data-bind="click: startTask(TTaskID)" />
+                        <!-- ko ifnot: $root.InProgress -->
+                        <input type="submit" value="Start" class="btn btn-primary btn-xs btn-success summarybutton" data-bind="click: startTask.bind($data, TTaskID())" />
                         <!-- /ko -->
                     </span>
                 </td>
@@ -72,7 +72,7 @@
                 <td class="center" style="width: 120px;">End</td>
                 <td class="center" style="width: 100px;">Project</td>
                 <td class="center" style="width: 350px;">Task</td>
-                <td class="center">Billed</td>
+                <td class="center">Contrib</td>
                 <td class="center">Status</td>
                 <td class="center">&nbsp;</td>
             </tr>
@@ -96,7 +96,7 @@
     @Scripts.Render("~/bundles/tracktor")
 
     <script type="text/javascript">
-        updateHomeModel();
+        refreshModel();
     </script>
 }
 
