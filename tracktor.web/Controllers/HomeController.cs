@@ -11,14 +11,14 @@ namespace tracktor.web.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
+            ViewBag.Title = "tracktor";
 
             return View();
         }
 
         public ActionResult SignIn()
         {
-            ViewBag.Title = "Sign In";
+            ViewBag.Title = "sign in";
 
             return View();
         }

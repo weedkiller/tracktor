@@ -1,95 +1,139 @@
-﻿<div class="container " style="max-width: 1000px; margin: 0 auto 20px auto;">
-    <div style="width: 100%; overflow: auto;">
-        <div style="padding: 10px; float: left;">
-            <h2 style="display: inline;">tracktor</h2>
+﻿<div class="container " style="max-width: 1000px; margin: 15px auto 20px auto;">
+    @*    <div style="width: 100%; overflow: auto;">
+            <div style="padding: 10px; float: left;">
+                <h2 style="display: inline;">tracktor</h2>
+            </div>
+        </div>*@
+
+    <div class="top curtain">
+        <!-- ko if: $root.InProgress -->
+        <div class="topheader bg-danger">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 25%; text-align: left;"><h3 style="margin: 0;">Active</h3></td>
+                    <td style="width: 25%; text-align: center;"><h4 style="margin: 0;"><span data-bind="text: LatestEntry.ProjectName"></span> / <span data-bind="text: LatestEntry.TaskName"></span></h4></td>
+                    <td style="width: 25%; text-align: center;"><h4 style="margin: 0;"><span data-bind="text: timeSpanFull(LatestEntry.Contrib())"></span></h4></td>
+                    <td style="width: 25%; text-align: right;"><button class="btn btn-xs btn-danger summarybutton" data-bind="click: stopTask.bind($data, $root.LatestEntry.TTaskID())">Stop</button></td>
+                </tr>
+            </table>
         </div>
+        <!-- /ko -->
+        <!-- ko ifnot: $root.InProgress -->
+        <div class="topheader bg-success">            
+            <table style="width: 100%;">
+                <tr>
+                    <td style="width: 25%; text-align: left;"><h3 style="margin: 0;">Idle</h3></td>
+                    <td style="width: 25%; text-align: center;"><h4 style="margin: 0;"><span data-bind="text: LatestEntry.ProjectName"></span> / <span data-bind="text: LatestEntry.TaskName"></span></h4></td>
+                    <td style="width: 25%; text-align: center;"><h4 style="margin: 0;"><span data-bind="text: timeSpanFull(LatestEntry.Contrib())"></span></h4></td>
+                    <td style="width: 25%; text-align: right;"><button class="btn btn-primary btn-xs btn-success summarybutton" data-bind="click: startTask.bind($data, $root.LatestEntry.TTaskID())">Continue</button></td>
+                </tr>
+            </table>
+        </div>
+        <!-- /ko -->
     </div>
 
-    <table class="table table-condensed table-hover">
-        <thead>
-            <tr class="emphasis">
-                <td class="center" style="width: 100px;">Project</td>
-                <td class="center" style="width: 350px;">Task</td>
-                <td class="center" style="width: 100px;">Status</td>
-                <td class="center" style="width: 100px;">Today</td>
-                <td class="center" style="width: 100px;">Week</td>
-                <td class="center" style="width: 100px;">Month</td>
-                <td class="center" style="width: 100px;">&nbsp;</td>
-            </tr>
-        </thead>
-        <tbody data-bind="foreach: Projects">
-            <tr class="active">
-                <td data-bind="text: Name"></td>
-                <td>@*<button class="btn btn-default btn-xs" onclick="newTask(@project.ProjectId);">+</button>*@</td>
-                <td class="center"><span data-bind="if: InProgress">Active</span></td>
-                <td class="center"><span data-bind="text: timeSpan(Contrib.Today())"></span></td>
-                <td class="center"><span data-bind="text: timeSpan(Contrib.ThisWeek())"></span></td>
-                <td class="center"><span data-bind="text: timeSpan(Contrib.ThisMonth())"></span></td>
-                <td class="center">&nbsp;</td>
-            </tr>
-            <!-- ko foreach: TTasks -->
-            <tr data-bind="css: { success: InProgress }">
-                <td>&nbsp;</td>
-                <td data-bind="text: Name"></td>
-                <td class="center"><span data-bind="if: InProgress">Active</span></td>
-                <td class="center"><span data-bind="text: timeSpan(Contrib.Today())"></span></td>
-                <td class="center"><span data-bind="text: timeSpan(Contrib.ThisWeek())"></span></td>
-                <td class="center"><span data-bind="text: timeSpan(Contrib.ThisMonth())"></span></td>
-                <td class="center">
-                    <span data-bind="if: InProgress">
-                        <input type="submit" value="Stop" class="btn btn-xs btn-danger summarybutton" data-bind="click: stopTask.bind($data, TTaskID())" />
-                    </span>
-                    <span data-bind="ifnot: InProgress">
-                        <input data-bind="value: TTaskID" type="hidden" name="tTaskId" />
-                        <!-- ko if: $root.InProgress -->
-                        <input type="submit" value="Switch" class="btn btn-xs btn-success summarybutton" data-bind="click: switchTask.bind($data, TTaskID())" />
-                        <!-- /ko -->
-                        <!-- ko ifnot: $root.InProgress -->
-                        <input type="submit" value="Start" class="btn btn-primary btn-xs btn-success summarybutton" data-bind="click: startTask.bind($data, TTaskID())" />
-                        <!-- /ko -->
-                    </span>
-                </td>
-            </tr>
-            <!-- /ko -->
-        </tbody>
-        <tbody>
-            <tr class="emphasis active">
-                <td>TOTAL</td>
-                <td>&nbsp;</td>
-                <td class="center">&nbsp;</td>
-                <td class="center" data-bind="text: timeSpan(Contrib.Today())"></td>
-                <td class="center" data-bind="text: timeSpan(Contrib.ThisWeek())"></td>
-                <td class="center" data-bind="text: timeSpan(Contrib.ThisMonth())"></td>
-                <td class="center">&nbsp;</td>
-            </tr>
-        </tbody>
-    </table>
-    <hr />
-    <table class="table table-striped table-condensed">
-        <thead>
-            <tr class="emphasis">
-                <td class="center" style="width: 120px;">Start</td>
-                <td class="center" style="width: 120px;">End</td>
-                <td class="center" style="width: 100px;">Project</td>
-                <td class="center" style="width: 350px;">Task</td>
-                <td class="center">Contrib</td>
-                <td class="center">Status</td>
-                <td class="center">&nbsp;</td>
-            </tr>
-        </thead>
-        <tbody data-bind="foreach: Entries">
-            <tr>
-                <td class="center" data-bind="text: dateTime(StartDate())"></td>
-                <td class="center" data-bind="text: dateTime(EndDate())"></td>
-                <td data-bind="text: ProjectName"></td>
-                <td data-bind="text: TaskName"></td>
-                <td class="center" data-bind="text: timeSpan(Contrib())"></td>
-                <td class="center" data-bind="text: InProgress"></td>
-                <td class="center"><a href="#" class="btn btn-xs">Edit</a></td>
-            </tr>
-        </tbody>
-    </table>
+    <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Summary</a></li>
+            <li role="presentation"><a href="#report" aria-controls="report" role="tab" data-toggle="tab">Report</a></li>
+        </ul>
 
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="home">
+                <div class="curtain tabcontent">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <tr class="emphasis">
+                                <td class="center" style="width: 100px;">Project</td>
+                                <td class="center" style="width: 350px;">Task</td>
+                                <td class="center" style="width: 100px;">Status</td>
+                                <td class="center" style="width: 100px;">Today</td>
+                                <td class="center" style="width: 100px;">Week</td>
+                                <td class="center" style="width: 100px;">Month</td>
+                                <td class="center" style="width: 100px;">&nbsp;</td>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: Projects">
+                            <tr class="active">
+                                <td data-bind="text: Name"></td>
+                                <td>@*<button class="btn btn-default btn-xs" onclick="newTask(@project.ProjectId);">+</button>*@</td>
+                                <td class="center"><span data-bind="if: InProgress">Active</span></td>
+                                <td class="contrib"><span data-bind="text: timeSpan(Contrib.Today())"></span></td>
+                                <td class="contrib"><span data-bind="text: timeSpan(Contrib.ThisWeek())"></span></td>
+                                <td class="contrib"><span data-bind="text: timeSpan(Contrib.ThisMonth())"></span></td>
+                                <td class="center">&nbsp;</td>
+                            </tr>
+                            <!-- ko foreach: TTasks -->
+                            <tr data-bind="css: { success: InProgress }">
+                                <td>&nbsp;</td>
+                                <td data-bind="text: Name"></td>
+                                <td class="center"><span data-bind="if: InProgress">Active</span></td>
+                                <td class="contrib"><span data-bind="text: timeSpan(Contrib.Today())"></span></td>
+                                <td class="contrib"><span data-bind="text: timeSpan(Contrib.ThisWeek())"></span></td>
+                                <td class="contrib"><span data-bind="text: timeSpan(Contrib.ThisMonth())"></span></td>
+                                <td class="center">
+                                    <span data-bind="if: InProgress">
+                                        <input type="submit" value="Stop" class="btn btn-xs btn-danger summarybutton" data-bind="click: stopTask.bind($data, TTaskID())" />
+                                    </span>
+                                    <span data-bind="ifnot: InProgress">
+                                        <input data-bind="value: TTaskID" type="hidden" name="tTaskId" />
+                                        <!-- ko if: $root.InProgress -->
+                                        <input type="submit" value="Switch" class="btn btn-xs btn-success summarybutton" data-bind="click: switchTask.bind($data, TTaskID())" />
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: $root.InProgress -->
+                                        <input type="submit" value="Start" class="btn btn-primary btn-xs btn-success summarybutton" data-bind="click: startTask.bind($data, TTaskID())" />
+                                        <!-- /ko -->
+                                    </span>
+                                </td>
+                            </tr>
+                            <!-- /ko -->
+                        </tbody>
+                        <tbody>
+                            <tr class="emphasis active">
+                                <td>TOTAL</td>
+                                <td>&nbsp;</td>
+                                <td class="center">&nbsp;</td>
+                                <td class="contrib" data-bind="text: timeSpan(Contrib.Today())"></td>
+                                <td class="contrib" data-bind="text: timeSpan(Contrib.ThisWeek())"></td>
+                                <td class="contrib" data-bind="text: timeSpan(Contrib.ThisMonth())"></td>
+                                <td class="center">&nbsp;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr />
+                    <table class="table table-striped table-condensed">
+                        <thead>
+                            <tr class="emphasis">
+                                <td class="center" style="width: 120px;">Start</td>
+                                <td class="center" style="width: 120px;">End</td>
+                                <td class="center" style="width: 100px;">Project</td>
+                                <td class="center" style="width: 350px;">Task</td>
+                                <td class="contrib">Contrib</td>
+                                <td class="center">Status</td>
+                                <td class="center">&nbsp;</td>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: Entries">
+                            <tr>
+                                <td class="center" data-bind="text: dateTime(StartDate())"></td>
+                                <td class="center" data-bind="text: dateTime(EndDate())"></td>
+                                <td data-bind="text: ProjectName"></td>
+                                <td data-bind="text: TaskName"></td>
+                                <td class="contrib" data-bind="text: timeSpan(Contrib())"></td>
+                                <td class="center" data-bind="text: InProgress"></td>
+                                <td class="center"><a href="#" class="btn btn-xs">Edit</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="report">
+                <div class="tabcontent">
+                    report
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section scripts {
@@ -99,34 +143,3 @@
         refreshModel();
     </script>
 }
-
-
-<h3>Test</h3>
-<form action="@Url.Action("GetModel", "api/Tracktor")" method="post" id="testform">
-    <input type="text" name="UserName" />
-    <input type="text" name="Password" />
-    <input type="hidden" name="grant_type" value="password" />
-</form>
-
-<button onclick="testApi();" title="Test">Test</button>
-
-<script type="text/javascript">
-
-    var tokenKey = "TokenKey";
-
-    var testApi = function () {
-        var token = sessionStorage.getItem(tokenKey);
-        var headers = {};
-        if (token) {
-            headers.Authorization = 'Bearer ' + token;
-        }
-
-        $.ajax({
-            type: 'GET',
-            url: 'api/Tracktor/GetModel',
-            headers: headers
-        }).done(function (data) {
-            alert(data);
-        });
-    }
-</script>

@@ -31,6 +31,19 @@ var timeSpan = function (n: number) {
     return time;
 }
 
+var timeSpanFull = function (n: number) {
+    var sec_num = parseInt(n.toString(), 10);
+    if (sec_num === 0) {
+        return "00:00:00";
+    }
+    var hours = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = Math.floor((sec_num - (hours * 3600) - (minutes * 60)));
+
+    var time = padNumber(hours) + ":" + padNumber(minutes) + ":" + padNumber(seconds);
+    return time;
+}
+
 var isZero = function (n: number) {
     return (n == 0);
 }
@@ -112,14 +125,25 @@ var rootMapping = {
 
 var viewModel;
 
+var updateTitle = function () {
+    if (viewModel.InProgress()) {
+        document.title = "tr: " + viewModel.LatestEntry.ProjectName() + " / " + viewModel.LatestEntry.TaskName();
+    } else {
+        document.title = "tracktor (idle)";
+    }
+}
+
 var bindHomeModel = function (data) {
     viewModel = ko.mapping.fromJS(data, rootMapping);
     ko.applyBindings(viewModel);
-    upup();
+    updateTitle();
+    $('.curtain').removeClass('curtain');
+    timerFunc();
 };
 
 var updateHomeModel = function (data) {
     ko.mapping.fromJS(data, rootMapping, viewModel);
+    updateTitle();
 };
 
 var refreshModel = function () {
@@ -148,12 +172,32 @@ var requestData = function (url: string, method: string, data: any, callback: (a
     $.ajax(settings).done(callback);
 }
 
-var upup = function () {
-    var today = viewModel.Projects()[0].TTasks()[0].Contrib.Today();
-    var thisWeek = viewModel.Projects()[0].TTasks()[0].Contrib.ThisWeek();
-    var thisMonth = viewModel.Projects()[0].TTasks()[0].Contrib.ThisMonth();
-    viewModel.Projects()[0].TTasks()[0].Contrib.Today(today + 60);
-    viewModel.Projects()[0].TTasks()[0].Contrib.ThisWeek(thisWeek + 60);
-    viewModel.Projects()[0].TTasks()[0].Contrib.ThisMonth(thisMonth + 60);
-    setTimeout(upup, 1000);
+var timeTick = 1;
+
+var timerFunc = function () {
+    if (viewModel.InProgress()) {
+        viewModel.Projects().forEach(function (p) {
+            p.TTasks().forEach(function (t) {
+                if (t.InProgress()) {
+                    var today = t.Contrib.Today();
+                    var thisWeek = t.Contrib.ThisWeek();
+                    var thisMonth = t.Contrib.ThisMonth();
+                    t.Contrib.Today(today + timeTick);
+                    t.Contrib.ThisWeek(thisWeek + timeTick);
+                    t.Contrib.ThisMonth(thisMonth + timeTick);
+                }
+            });
+        });
+
+        viewModel.Entries().forEach(function (t) {
+            if (t.InProgress()) {
+                var contrib = t.Contrib();
+                t.Contrib(contrib + timeTick);
+            }
+        });
+
+        var current = viewModel.LatestEntry.Contrib();
+        viewModel.LatestEntry.Contrib(current + timeTick);
+    }
+    setTimeout(timerFunc, 1000);
 }

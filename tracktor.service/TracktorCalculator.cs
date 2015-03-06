@@ -130,7 +130,9 @@ namespace tracktor.service
                                 if (entriesById.TryGetValue(entry.TEntryID, out entryDto))
                                 {
                                     entryDto.Contrib = totalContrib;
-                                    if(!entry.EndDate.HasValue)
+                                    entryDto.TaskName = taskDto.Name;
+                                    entryDto.ProjectName = projectDto.Name;
+                                    if (!entry.EndDate.HasValue)
                                     {
                                         entryDto.InProgress = true;
                                         taskDto.InProgress = true;
@@ -146,11 +148,26 @@ namespace tracktor.service
                 }
             }
 
-            // dummy object for UI binding
-            if(!model.InProgress)
+            // latest entry (active or not)
+            var latestEntry = model.Entries.FirstOrDefault();
+            if (latestEntry == null)
+            {
+                latestEntry = new TEntryDto {
+                    TEntryID = 0,
+                    InProgress = false,
+                    TaskName = "(n/a)",
+                    Contrib = 0
+                };
+            }
+            model.LatestEntry = latestEntry;
+
+            // dummy task for model binding
+            if (!model.InProgress)
             {
                 model.TTaskInProgress = new TTaskDto {
-                     TTaskID = 0
+                    InProgress = false,
+                    TTaskID = 0,
+                    Name = "n/a"
                 };
             }
         }

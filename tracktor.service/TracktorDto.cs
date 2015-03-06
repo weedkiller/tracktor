@@ -42,6 +42,9 @@ namespace tracktor.service
 
         [DataMember]
         public TTaskDto TTaskInProgress {  get; set; }
+
+        [DataMember]
+        public TEntryDto LatestEntry { get; set; }
     }
 
     [DataContract]
@@ -59,6 +62,8 @@ namespace tracktor.service
         public string ProjectName { get; set; }
         [DataMember]
         public string TaskName { get; set; }
+        [DataMember]
+        public int TTaskID { get; set; }
         [DataMember]
         public double Contrib { get; set; }
     }

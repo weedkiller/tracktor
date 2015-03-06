@@ -42,7 +42,7 @@ namespace tracktor.service
                 TModelDto model = null;
                 model = new TModelDto {
                     Projects = _db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList(),
-                    Entries = GetEntries(context, null, null, 0, 100)
+                    Entries = GetEntries(context, null, null, 0, 20)
                 };
                 using (var calc = new TracktorCalculator(context))
                 {

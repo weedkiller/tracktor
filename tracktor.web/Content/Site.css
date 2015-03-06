@@ -1,5 +1,5 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 0px;
     padding-bottom: 20px;
 }
 
@@ -18,4 +18,31 @@ textarea {
 
 .summarybutton {
     width: 75px;
+}
+
+div.curtain {
+    display: none;
+}
+
+.contrib {
+    text-align: center;
+}
+
+.center{
+    text-align: center;
+}
+
+.tabcontent {
+    margin-top: 15px;
+}
+
+.topheader
+{
+    margin: 0 auto 10px auto;
+    padding: 10px;
+    border-color: #ddd;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    box-shadow: none;
 }
