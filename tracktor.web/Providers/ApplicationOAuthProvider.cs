@@ -44,10 +44,7 @@ namespace tracktor.web.Providers
             ClaimsIdentity cookiesIdentity = await user.GenerateUserIdentityAsync(userManager,
                 CookieAuthenticationDefaults.AuthenticationType);
 
-            oAuthIdentity.AddClaim(new Claim("TimeZone", user.TimeZone));
             oAuthIdentity.AddClaim(new Claim("TUserID", user.TUserID.ToString()));
-
-            cookiesIdentity.AddClaim(new Claim("TimeZone", user.TimeZone));
             cookiesIdentity.AddClaim(new Claim("TUserID", user.TUserID.ToString()));
 
             AuthenticationProperties properties = CreateProperties(user.UserName);

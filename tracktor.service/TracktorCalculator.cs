@@ -68,21 +68,25 @@ namespace tracktor.service
                 .Take(maxEntries <= 0 ? MaxEntries : maxEntries).ToList();
         }
 
-        protected void BucketEntry(TEntry entry, TracktorReport report)
+        protected double BucketEntry(TEntry entry, TracktorReport report)
         {
             DateTime localStart = ToLocal(entry.StartDate).Value;
             DateTime localEnd = ToLocal(entry.EndDate.HasValue ? entry.EndDate : DateTime.UtcNow).Value;
             DateTime firstDay = localStart.Date;
             DateTime lastDay = localEnd.Date;
             DateTime currentDay = firstDay;
+            double totalContrib = 0;
             while (currentDay <= lastDay)
             {
                 DateTime nextDay = currentDay.AddDays(1);
                 DateTime periodStart = currentDay > localStart ? currentDay : localStart;
                 DateTime periodEnd = nextDay > localEnd ? localEnd : nextDay;
-                report.AddContrib(currentDay, entry.TTaskID, (periodEnd - periodStart).TotalSeconds);
+                var periodContrib = (periodEnd - periodStart).TotalSeconds;
+                report.AddContrib(currentDay, entry.TTaskID, periodContrib);
                 currentDay = nextDay;
+                totalContrib += periodContrib;
             }
+            return totalContrib;
         }
 
         public TracktorReport GetReport(DateTime? startDate, DateTime endDate, int projectID)
@@ -105,6 +109,7 @@ namespace tracktor.service
             Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
             var taskToProject = model.Projects.SelectMany(p => p.TTasks.Select(t => new KeyValuePair<int, int>(t.TTaskID, t.TProjectID))).ToDictionary(t => t.Key, p => p.Value);
             List<TEntry> entries = GetEntries(startDate, endDate, 0);
+            var entriesById = model.Entries.ToDictionary(e => e.TEntryID, e => e);
             foreach (var taskEntry in entries.GroupBy(e => e.TTaskID))
             {
                 if (taskToProject.ContainsKey(taskEntry.Key))
@@ -118,7 +123,20 @@ namespace tracktor.service
                             var report = new TracktorReport(startDate, endDate);
                             foreach (var entry in taskEntry)
                             {
-                                BucketEntry(entry, report);
+                                var totalContrib = BucketEntry(entry, report);
+
+                                // find it individually
+                                TEntryDto entryDto;
+                                if (entriesById.TryGetValue(entry.TEntryID, out entryDto))
+                                {
+                                    entryDto.Contrib = totalContrib;
+                                    if(!entry.EndDate.HasValue)
+                                    {
+                                        entryDto.InProgress = true;
+                                        taskDto.InProgress = true;
+                                        projectDto.InProgress = true;
+                                    }
+                                }
                             }
                             taskDto.Contrib = report.GetContrib();
                         }

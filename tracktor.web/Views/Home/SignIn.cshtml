@@ -1,0 +1,54 @@
+﻿<h3>Sign In</h3>
+<blockquote>
+    <form action="@Url.Action("", "Token")" method="post" id="loginform">
+        <input type="text" name="UserName" id="username" />
+        <input type="text" name="Password" id="password" />
+        <input type="hidden" name="grant_type" value="password" />
+    </form>
+    <button onclick="signIn();" title="Login">Sign In</button>
+</blockquote>
+
+<h3>Register</h3>
+<blockquote>
+    @using (Html.BeginForm("Register", "api/Account", FormMethod.Post))
+    {
+        <span>Authorization code:</span><input type="text" name="Authorization" /><br />
+        <span>E-mail:</span><input type="text" name="Email" /><br />
+        <span>Password:</span><input type="text" name="Password" />
+        <span>Confirm Password:</span><input type="text" name="ConfirmPassword" /><br />
+        <span>Time Zone:</span>
+        <select name="TimeZone">
+            @foreach(TimeZoneInfo timezone in TimeZoneInfo.GetSystemTimeZones().OrderBy(p => p.BaseUtcOffset))
+            {
+                <option value="@timezone.Id" @(timezone.Id == "UTC" ? "selected=\"selected\"" : "")>@timezone.DisplayName</option>
+            }
+        </select>
+            <br />
+            <span><input type="submit" value="Register" /></span>
+            }
+    </blockquote>
+
+<script type="text/javascript">
+
+    var tokenKey = "TokenKey";
+
+    var signIn = function() {
+        var loginData = {
+            grant_type: 'password',
+            username: $('#username').val(),
+            password: $('#password').val()
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("", "Token")',
+            data: loginData
+        }).done(function (data) {
+            sessionStorage.setItem(tokenKey, data.access_token);
+            window.location.assign('@Url.Action("Index","Home")');
+        }).fail(function (data) {
+            alert("Invalid username/password: " + data);
+        });
+    }
+
+</script>

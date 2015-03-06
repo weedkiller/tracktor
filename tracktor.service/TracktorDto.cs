@@ -33,6 +33,9 @@ namespace tracktor.service
     {
         [DataMember]
         public List<TProjectDto> Projects { get; set; }
+
+        [DataMember]
+        public List<TEntryDto> Entries { get; set; }
     }
 
     [DataContract]
@@ -44,6 +47,12 @@ namespace tracktor.service
         public DateTime StartDate { get; set; }
         [DataMember]
         public DateTime? EndDate { get; set; }
+        [DataMember]
+        public bool InProgress { get; set; }
+        [DataMember]
+        public string ProjectName { get; set; }
+        [DataMember]
+        public string TaskName { get; set; }
         [DataMember]
         public double Contrib { get; set; }
     }
@@ -60,6 +69,8 @@ namespace tracktor.service
         [DataMember]
         public int DisplayOrder { get; set; }
         [DataMember]
+        public bool InProgress { get; set; }
+        [DataMember]
         public bool IsObsolete { get; set; }
         [DataMember]
         public TContribDto Contrib { get; set; }
@@ -74,6 +85,8 @@ namespace tracktor.service
         public string Name { get; set; }
         [DataMember]
         public int DisplayOrder { get; set; }
+        [DataMember]
+        public bool InProgress { get; set; }
         [DataMember]
         public bool IsObsolete { get; set; }
         [DataMember]

@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Web;
 using System.Web.Http;
+using Microsoft.Owin;
+using Microsoft.AspNet.Identity.Owin;
 using tracktor.service;
 
 namespace tracktor.web.Controllers
@@ -13,15 +15,22 @@ namespace tracktor.web.Controllers
     [Authorize]
     public class TracktorController : ApiController
     {
-        private ITracktorService _service = new TracktorService(); // could also be remotely hosted
+        private ITracktorService _service = new TracktorService(); // load locally, but can replace with remote invocation
 
         private TContextDto Context
         {
             get
             {
+                var userID = Int32.Parse(this.Request.GetOwinContext().Authentication.User.FindFirst("TUserID").Value);
+                var user = Request.GetOwinContext().GetUserManager<ApplicationUserManager>().Users.Where(u => u.TUserID == userID).FirstOrDefault();
+                var userTimeZone = TimeZoneInfo.Utc;
+                if (!string.IsNullOrWhiteSpace(user.TimeZone))
+                {
+                    userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone);
+                }
                 return new TContextDto {
-                    TUserID = Int32.Parse(this.Request.GetOwinContext().Authentication.User.FindFirst("TUserID").Value),
-                    UTCOffset = 5
+                    TUserID = userID,
+                    UTCOffset = (int)userTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes
                 };
             }
         }
@@ -58,17 +67,20 @@ namespace tracktor.web.Controllers
 
         public TModelDto StopTask(int currentTaskID)
         {
-            return _service.StopTask(Context, currentTaskID);
+            _service.StopTask(Context, currentTaskID);
+            return _service.GetModel(Context);
         }
 
         public TModelDto StartTask(int newTaskID)
         {
-            return _service.StartTask(Context, newTaskID);
+            _service.StartTask(Context, newTaskID);
+            return _service.GetModel(Context);
         }
 
         public TModelDto SwitchTask(int currentTaskID, int newTaskId)
         {
-            return _service.SwitchTask(Context, currentTaskID, newTaskId);
+            _service.SwitchTask(Context, currentTaskID, newTaskId);
+            return _service.GetModel(Context);
         }
 
         protected override void Dispose(bool disposing)

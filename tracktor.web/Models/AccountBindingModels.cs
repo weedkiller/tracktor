@@ -35,11 +35,14 @@ namespace tracktor.web.Models
     public class RegisterBindingModel
     {
         [Required]
+        [Display(Name = "Authorization code")]
+        public string Authorization { get; set; }
+
+        [Required]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
-        [Display(Name = "TimeZone")]
+        [Display(Name = "Time Zone")]
         public string TimeZone { get; set; }
 
         [Required]

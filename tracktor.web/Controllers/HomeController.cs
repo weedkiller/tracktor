@@ -8,9 +8,17 @@ namespace tracktor.web.Controllers
 {
     public class HomeController : Controller
     {
+        [Authorize]
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
+
+            return View();
+        }
+
+        public ActionResult SignIn()
+        {
+            ViewBag.Title = "Sign In";
 
             return View();
         }

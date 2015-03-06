@@ -41,7 +41,8 @@ namespace tracktor.service
             {
                 TModelDto model = null;
                 model = new TModelDto {
-                    Projects = _db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
+                    Projects = _db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList(),
+                    Entries = GetEntries(context, null, null, 0, 100)
                 };
                 using (var calc = new TracktorCalculator(context))
                 {
@@ -121,7 +122,7 @@ namespace tracktor.service
             }
         }
 
-        public TModelDto StopTask(TContextDto context, int currentTaskID)
+        public void StopTask(TContextDto context, int currentTaskID)
         {
             try
             {
@@ -129,7 +130,6 @@ namespace tracktor.service
                 {
                     states.Stop(currentTaskID);
                 }
-                return GetModel(context);
             }
             catch (Exception ex)
             {
@@ -137,7 +137,7 @@ namespace tracktor.service
             }
         }
 
-        public TModelDto StartTask(TContextDto context, int newTaskID)
+        public void StartTask(TContextDto context, int newTaskID)
         {
             try
             {
@@ -145,7 +145,6 @@ namespace tracktor.service
                 {
                     states.Start(newTaskID);
                 }
-                return GetModel(context);
             }
             catch (Exception ex)
             {
@@ -153,7 +152,7 @@ namespace tracktor.service
             }
         }
 
-        public TModelDto SwitchTask(TContextDto context, int currentTaskID, int newTaskID)
+        public void SwitchTask(TContextDto context, int currentTaskID, int newTaskID)
         {
             try
             {
@@ -162,7 +161,6 @@ namespace tracktor.service
                     states.Stop(currentTaskID);
                     states.Start(newTaskID);
                 }
-                return GetModel(context);
             }
             catch (Exception ex)
             {

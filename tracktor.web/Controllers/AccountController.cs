@@ -17,6 +17,7 @@ using tracktor.web.Models;
 using tracktor.web.Providers;
 using tracktor.web.Results;
 using tracktor.service;
+using System.Configuration;
 
 namespace tracktor.web.Controllers
 {
@@ -323,6 +324,11 @@ namespace tracktor.web.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if(!string.Equals(model.Authorization, ConfigurationManager.AppSettings["AuthorizationCode"]))
+            {
+                return BadRequest("Incorrect Authorization Code.");
             }
 
             var user = new ApplicationUser() { UserName = model.Email, Email = model.Email, TimeZone = model.TimeZone };

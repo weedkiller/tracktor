@@ -33,12 +33,12 @@ namespace tracktor.service
         TracktorReportDto GetReport(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID);
 
         [OperationContract]
-        TModelDto StopTask(TContextDto context, int currentTaskID);
+        void StopTask(TContextDto context, int currentTaskID);
 
         [OperationContract]
-        TModelDto StartTask(TContextDto context, int newTaskID);
+        void StartTask(TContextDto context, int newTaskID);
 
         [OperationContract]
-        TModelDto SwitchTask(TContextDto context, int currentTaskID, int newTaskId);
+        void SwitchTask(TContextDto context, int currentTaskID, int newTaskId);
     }
 }
