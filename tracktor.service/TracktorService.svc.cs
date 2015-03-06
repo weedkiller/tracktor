@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -60,7 +61,7 @@ namespace tracktor.service
         {
             try
             {
-                return UpdateObject<TTaskDto, TTask>(context, task, _db.TTasks, (d => d.TTaskID), (t => t.TTaskID));
+                return UpdateObject<TTaskDto, TTask>(context, task, _db.TTasks, (t => t.TTaskID == task.TTaskID));
             }
             catch (Exception ex)
             {
@@ -72,7 +73,7 @@ namespace tracktor.service
         {
             try
             {
-                return UpdateObject<TProjectDto, TProject>(context, project, _db.TProjects, (d => d.TProjectID), (t => t.TProjectID));
+                return UpdateObject<TProjectDto, TProject>(context, project, _db.TProjects, (t => t.TProjectID == project.TProjectID));
             }
             catch (Exception ex)
             {
@@ -84,7 +85,40 @@ namespace tracktor.service
         {
             try
             {
-                return UpdateObject<TEntryDto, TEntry>(context, entry, _db.TEntries, (d => d.TEntryID), (t => t.TEntryID));
+                if (entry.TEntryID > 0)
+                {
+                    var existingEntry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entry.TEntryID);
+                    if (existingEntry != null)
+                    {
+                        using (var calculator = new TracktorCalculator(context))
+                        {
+                            if (existingEntry.TTask.TProject.TUserID == context.TUserID)
+                            {
+                                if (entry.IsDeleted == true)
+                                {
+                                    _db.TEntries.Remove(existingEntry);
+                                    _db.SaveChanges();
+                                    return null;
+                                }
+                                else
+                                {
+                                    var startUtc = calculator.ToUtc(entry.StartDate).Value;
+                                    var endUtc = calculator.ToUtc(entry.EndDate);
+                                    var now = DateTime.UtcNow;
+                                    if(startUtc <= now && 
+                                        (!endUtc.HasValue || (endUtc.HasValue && endUtc.Value <= now && endUtc.Value > startUtc)))
+                                    {
+                                        existingEntry.StartDate = startUtc;
+                                        existingEntry.EndDate = endUtc;
+                                        _db.SaveChanges();
+                                    }
+                                }                                
+                            }
+                            return calculator.EnrichTEntry(null, existingEntry);
+                        }
+                    }
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -172,23 +206,24 @@ namespace tracktor.service
 
         #region Helpers
 
-        protected D UpdateObject<D, T>(TContextDto context, D dto, DbSet<T> dbSet, Func<D, int> dtoID, Func<T, int> tID)
+        protected D UpdateObject<D, T>(TContextDto context, D dto, DbSet<T> dbSet, Expression<Func<T, bool>> equality)
             where D : new()
             where T : class, new()
         {
-            var storedObject = dbSet.SingleOrDefault(t => tID(t) == dtoID(dto));
+            int dtoId = 0;
+            var storedObject = dbSet.Where(Expression.Lambda<Func<T, bool>>(equality, Expression.Parameter(typeof(T), "t"))).SingleOrDefault();
             if (storedObject == null)
             {
-                if (dtoID(dto) != 0)
+                if (dtoId != 0)
                 {
-                    throw new Exception(String.Format("Unable to find existing {0} object with ID {1}!", typeof(T).Name, dtoID(dto)));
+                    throw new Exception(String.Format("Unable to find existing {0} object with ID {1}!", typeof(T).Name, dtoId));
                 }
                 storedObject = new T();
                 dbSet.Add(storedObject);
             }
             else if (!IsAllowed(context, storedObject))
             {
-                throw new Exception(String.Format("User ID {0} is not allowed to modify {1} object with ID {2}!", context.TUserID, typeof(T).Name, dtoID(dto)));
+                throw new Exception(String.Format("User ID {0} is not allowed to modify {1} object with ID {2}!", context.TUserID, typeof(T).Name, dtoId));
             }
             Mapper.Map<D, T>(dto, storedObject);
             _db.SaveChanges();

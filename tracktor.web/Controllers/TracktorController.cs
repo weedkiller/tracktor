@@ -36,7 +36,7 @@ namespace tracktor.web.Controllers
                 }
                 return new TContextDto {
                     TUserID = userID,
-                    UTCOffset = (int)userTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes
+                    UTCOffset = -(int)userTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes
                 };
             }
         }

@@ -10,6 +10,9 @@ var padNumber = function (n: number) {
 };
 
 var dateTime = function (s: string) {
+    if (s == null) {
+        return "-";
+    }
     var date = new Date(s);
     var dateString =
         padNumber(date.getDate()) + "/" +
@@ -84,15 +87,40 @@ var switchTask = function (taskId: number) {
 }
 
 var stopTask = function (taskId: number) {
-    /*alert("Stop " + taskId);*/
     requestData("/api/Tracktor/StopTask", "POST", {
         currentTaskID: taskId
     }, updateHomeModel);
 }
 
+var saveEntry = function () {
+    $('#IsDeleted').val("false");
+    requestData("/api/Tracktor/UpdateEntry", "POST",
+        $("#entryEditForm").serialize(),
+        function (data) {
+            updateEditingEntry(ko.mapping.fromJS(data))
+        });
+}
+
+var deleteEntry = function () {
+    $('#IsDeleted').val("true");
+    requestData("/api/Tracktor/UpdateEntry", "POST",
+        $("#entryEditForm").serialize(),
+        function (data) {
+            refreshModel();
+        });
+}
+
 var rootModel = function (data) {
     ko.mapping.fromJS(data, rootMapping, this)
 };
+
+var editingEntry: any = ko.mapping.fromJS({
+    TaskName: "-",
+    ProjectName: "-",
+    Contrib: 0,
+    StartDate: 0,
+    EndDate: 0
+});
 
 var rootMapping = {
     'Projects': {
@@ -119,6 +147,7 @@ var rootMapping = {
                 }, 0)
             }, viewModel)
         };
+        viewModel.EditingEntry = ko.observable(editingEntry);
         return viewModel;
     }
 };
@@ -147,6 +176,10 @@ var updateHomeModel = function (data) {
 };
 
 var refreshModel = function () {
+    requestData("api/Tracktor/GetModel", "GET", {}, updateHomeModel);
+};
+
+var initializeModel = function () {
     requestData("api/Tracktor/GetModel", "GET", {}, bindHomeModel);
 };
 
@@ -172,7 +205,16 @@ var requestData = function (url: string, method: string, data: any, callback: (a
     $.ajax(settings).done(callback);
 }
 
-var timeTick = 1;
+var timeTick = 60;
+
+$.ajaxSetup({
+    statusCode: {
+        401: function () {
+            alert("Authorization expired, please sign in.");
+            window.location.assign("/Home/SignIn");
+        }
+    }
+});
 
 var timerFunc = function () {
     if (viewModel.InProgress()) {
@@ -201,3 +243,23 @@ var timerFunc = function () {
     }
     setTimeout(timerFunc, 1000);
 }
+
+var updateEditingEntry = function (data) {
+    viewModel.EditingEntry(data);
+}
+
+$('#entryEditModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var entryId = button.data('entryid') // Extract info from data-* attributes
+    var modal = $(this)
+
+    viewModel.Entries().forEach(function (e) {
+        if (e.TEntryID() == entryId) {
+            modal.find('.modal-title').text('Edit entry for ' + e.TaskName())
+            var copyOfE = jQuery.extend({}, e);
+            copyOfE.StartDate = e.StartDate();
+            copyOfE.EndDate = e.EndDate();
+            updateEditingEntry(copyOfE);
+        }
+    });
+})

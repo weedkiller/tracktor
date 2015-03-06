@@ -66,6 +66,8 @@ namespace tracktor.service
         public int TTaskID { get; set; }
         [DataMember]
         public double Contrib { get; set; }
+        [DataMember]
+        public bool IsDeleted { get; set; }
     }
 
     [DataContract]

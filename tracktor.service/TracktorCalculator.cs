@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace tracktor.service
             return inputDate.Value;
         }
 
-        protected DateTime? ToUtc(DateTime? inputDate)
+        public DateTime? ToUtc(DateTime? inputDate)
         {
             if (inputDate.HasValue)
             {
@@ -40,7 +41,7 @@ namespace tracktor.service
             return null;
         }
 
-        protected DateTime? ToLocal(DateTime? inputDate)
+        public DateTime? ToLocal(DateTime? inputDate)
         {
             if (inputDate.HasValue)
             {
@@ -61,7 +62,7 @@ namespace tracktor.service
             }
             DateTime? utcStart = ToUtc(startDate);
             DateTime? utcEnd = ToUtc(endDate);
-            return _db.TEntries.Where(e => (e.TTask.TProjectID == projectID || projectID == 0) && e.TTask.TProject.TUserID == mContext.TUserID)
+            return _db.TEntries.AsNoTracking().Where(e => (e.TTask.TProjectID == projectID || projectID == 0) && e.TTask.TProject.TUserID == mContext.TUserID)
                 .Where(e => !(utcStart.HasValue && e.EndDate.HasValue && e.EndDate < utcStart)
                             && !(e.StartDate > utcEnd))
                 .OrderByDescending(e => e.EndDate.HasValue ? e.EndDate.Value : e.StartDate)
@@ -103,6 +104,34 @@ namespace tracktor.service
             return report;
         }
 
+        public TEntryDto EnrichTEntry(TEntryDto entryDto, TEntry entry)
+        { 
+            var dto = entryDto;
+            if (dto == null)
+            {
+                dto = Mapper.Map<TEntryDto>(entry);
+            }
+            else
+            {
+                Mapper.Map<TEntry, TEntryDto>(entry, entryDto);
+            }
+            dto.StartDate = ToLocal(entry.StartDate).Value;
+            dto.EndDate = ToLocal(entry.EndDate);
+            if (string.IsNullOrWhiteSpace(dto.TaskName))
+            {
+                dto.TaskName = entry.TTask.Name;
+            }
+            if (string.IsNullOrWhiteSpace(dto.ProjectName))
+            {
+                dto.ProjectName = entry.TTask.TProject.Name;
+            }
+            if(dto.Contrib == 0)
+            {
+                dto.Contrib = (DateOrLocalNow(dto.EndDate) - dto.StartDate).TotalSeconds;
+            }
+            return dto;
+        }
+
         public void CalculateContribs(DateTime? startDate, DateTime endDate, TModelDto model)
         {
             Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
@@ -129,9 +158,13 @@ namespace tracktor.service
                                 TEntryDto entryDto;
                                 if (entriesById.TryGetValue(entry.TEntryID, out entryDto))
                                 {
-                                    entryDto.Contrib = totalContrib;
                                     entryDto.TaskName = taskDto.Name;
                                     entryDto.ProjectName = projectDto.Name;
+                                    
+                                    // convert to local time
+                                    entryDto = EnrichTEntry(entryDto, entry);
+                                    entryDto.Contrib = totalContrib;
+
                                     if (!entry.EndDate.HasValue)
                                     {
                                         entryDto.InProgress = true;

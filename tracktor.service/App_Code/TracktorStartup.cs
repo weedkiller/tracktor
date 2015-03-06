@@ -22,6 +22,7 @@ namespace tracktor.service
             Mapper.CreateMap<TEntry, TEntryDto>().AfterMap((src, dst) => {
                 dst.Contrib = 0;
                 dst.InProgress = false;
+                dst.IsDeleted = false;
             });
 
             Mapper.CreateMap<TracktorReport, TracktorReportDto>();
