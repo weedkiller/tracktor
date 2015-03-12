@@ -57,7 +57,7 @@ namespace tracktor.model.DAL
 
     public class TracktorContext : DbContext
     {
-        public TracktorContext() : base("TracktorContext")
+        public TracktorContext() : base("DefaultConnection")
         {
 
         }

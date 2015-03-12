@@ -243,14 +243,12 @@ var requestData = function (url: string, method: string, data: any, callback: (a
 var timeTick = 1;
 
 $.ajaxSetup({
-    statusCode: {
-        401: function () {
+    error: function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 401) {
             alert("Authorization expired, please sign in.");
             window.location.assign(_urlRoot + "Home/SignIn");
-            enableButtons();
-        },
-        default: function (data) {
-            alert("Error: " + data.statusText);
+        } else {
+            alert("Error: " + textStatus + ": " + errorThrown);
             enableButtons();
         }
     }

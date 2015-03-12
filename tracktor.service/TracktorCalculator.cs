@@ -110,6 +110,21 @@ namespace tracktor.service
             var dto = entryDto;
             if (dto == null)
             {
+                if (entry == null)
+                {
+                    return new TEntryDto
+                    {
+                        Contrib = 0,
+                        EndDate = DateTime.UtcNow,
+                        StartDate = DateTime.UtcNow,
+                        InProgress = false,
+                        IsDeleted = true,
+                        ProjectName = "",
+                        TaskName = "",
+                        TEntryID = 0,
+                        TTaskID = 0
+                    };
+                }
                 dto = Mapper.Map<TEntryDto>(entry);
             }
             else
@@ -207,6 +222,7 @@ namespace tracktor.service
                 entryDto.ProjectName = description.ProjectName;
                 entryDto.Contrib = BucketEntry(entry, report);
                 entryDto.InProgress = (!entry.EndDate.HasValue);
+                EnrichTEntry(entryDto, entry);
                 dtos.Add(entryDto);
             }
 
