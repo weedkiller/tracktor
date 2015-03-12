@@ -1,54 +1,148 @@
-﻿<h3>Sign In</h3>
-<blockquote>
-    <form action="@Url.Action("", "Token")" method="post" id="loginform">
-        <input type="text" name="UserName" id="username" />
-        <input type="text" name="Password" id="password" />
-        <input type="hidden" name="grant_type" value="password" />
-    </form>
-    <button onclick="signIn();" title="Login">Sign In</button>
-</blockquote>
+﻿<div class="row" style="margin-top: 20px;">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">sign in</h3>
+            </div>
+            <div class="panel-body">
+                <form action="#" method="post" id="loginform">
+                    <div class="form-group">
+                        <label for="username">e-mail:</label>
+                        <input type="text" class="form-control" name="username" id="username" placeholder="enter e-mail" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">password</label>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="enter password" />
+                    </div>
+                    <input type="hidden" name="grant_type" value="password" />
+                    <button class="btn btn-success" onclick="signIn();" title="sign in" type="button" id="signinbutton">sign in</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">register</h3>
+            </div>
+            <div class="panel-body">
+                <form action="#" method="post" id="registerform">
+                    <div class="form-group">
+                        <label for="Authorization">authorization code:</label>&nbsp;<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" title="provided by the owner of this site"></span>
+                        <input type="password" name="Authorization" id="Authorization" placeholder="enter authorization code" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="RegisterEmail">e-mail:</label>
+                        <input type="text" name="Email" id="RegisterEmail" class="form-control" placeholder="enter e-mail" />
+                    </div>
+                    <div class="form-group">
+                        <label for="RegisterPassword">password:</label>
+                        <input type="password" name="Password" id="RegisterPassword" class="form-control" placeholder="enter password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="ConfirmPassword">confirm password:</label>
+                        <input type="password" name="ConfirmPassword" id="ConfirmPassword" class="form-control" placeholder="re-enter password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="TimeZone">time zone:</label>
+                        <select name="TimeZone" id="TimeZone" class="form-control">
+                            @foreach (TimeZoneInfo timezone in TimeZoneInfo.GetSystemTimeZones().OrderBy(p => p.BaseUtcOffset))
+                            {
+                                <option value="@timezone.Id" @(timezone.Id == "UTC" ? "selected=\"selected\"" : "")>@timezone.DisplayName</option>
+                            }
+                        </select>
+                    </div>
 
-<h3>Register</h3>
-<blockquote>
-    @using (Html.BeginForm("Register", "api/Account", FormMethod.Post))
-    {
-        <span>Authorization code:</span><input type="text" name="Authorization" /><br />
-        <span>E-mail:</span><input type="text" name="Email" /><br />
-        <span>Password:</span><input type="text" name="Password" />
-        <span>Confirm Password:</span><input type="text" name="ConfirmPassword" /><br />
-        <span>Time Zone:</span>
-        <select name="TimeZone">
-            @foreach(TimeZoneInfo timezone in TimeZoneInfo.GetSystemTimeZones().OrderBy(p => p.BaseUtcOffset))
-            {
-                <option value="@timezone.Id" @(timezone.Id == "UTC" ? "selected=\"selected\"" : "")>@timezone.DisplayName</option>
+                    <button class="btn btn-primary" onclick="register();" title="register" type="button">register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+
+        var tokenKey = "TokenKey";
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        $("#loginform").keyup(function (event) {
+            if (event.keyCode == 13) {
+                $("#signinbutton").click();
             }
-        </select>
-            <br />
-            <span><input type="submit" value="Register" /></span>
-            }
-    </blockquote>
-
-<script type="text/javascript">
-
-    var tokenKey = "TokenKey";
-
-    var signIn = function() {
-        var loginData = {
-            grant_type: 'password',
-            username: $('#username').val(),
-            password: $('#password').val()
-        };
-
-        $.ajax({
-            type: 'POST',
-            url: '@Url.Action("", "Token")',
-            data: loginData
-        }).done(function (data) {
-            sessionStorage.setItem(tokenKey, data.access_token);
-            window.location.assign('@Url.Action("Index","Home")');
-        }).fail(function (data) {
-            alert("Invalid username/password: " + data);
         });
-    }
 
-</script>
+        var signIn = function () {
+            internalSignIn($('#username').val(), $('#password').val());
+        }
+
+        var internalSignIn = function (username, password) {
+            var loginData = {
+                grant_type: 'password',
+                username: username,
+                password: password
+            };
+
+            if (!loginData.username || !loginData.password) {
+                bootbox.alert("Username and password cannot be empty.");
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("", "Token")',
+                data: loginData
+            }).done(function (data) {
+                sessionStorage.setItem(tokenKey, data.access_token);
+                window.location.assign('@Url.Action("Index","Home")');
+            }).fail(function (data) {
+                bootbox.alert(data.responseJSON.error_description);
+            });
+        }
+
+        var register = function () {
+            var registerData =
+                {
+                    Authorization: $('#Authorization').val(),
+                    Email: $('#RegisterEmail').val(),
+                    Password: $('#RegisterPassword').val(),
+                    ConfirmPassword: $('#ConfirmPassword').val(),
+                    TimeZone: $('#TimeZone').val()
+                };
+
+            if (!registerData.Authorization || !registerData.Email || !registerData.Password || !registerData.ConfirmPassword) {
+                bootbox.alert("Please fill in all fields on the registration form.");
+                return;
+            }
+            if (registerData.Password != registerData.ConfirmPassword) {
+                bootbox.alert("Password and confirmation don't match!");
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Register", "api/Account")',
+                data: registerData
+            }).done(function (data) {
+                internalSignIn($('#RegisterEmail').val(), $('#RegisterPassword').val());
+            }).fail(function (data) {
+                var errors = "";
+                var modelState = data.responseJSON.ModelState;
+                if (modelState) {
+                    for (var key in modelState) {
+                        for (var i = 0; i < modelState[key].length; i++) {
+                            errors = errors + modelState[key][i] + "<br/>";
+                        }
+                    }
+                    bootbox.alert(errors);
+                }
+                else {
+                    bootbox.alert(data.responseJSON.Message);
+                }
+            });
+        }
+
+    </script>
+}

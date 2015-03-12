@@ -205,7 +205,7 @@ var requestData = function (url: string, method: string, data: any, callback: (a
     $.ajax(settings).done(callback);
 }
 
-var timeTick = 60;
+var timeTick = 1;
 
 $.ajaxSetup({
     statusCode: {
@@ -263,3 +263,12 @@ $('#entryEditModal').on('show.bs.modal', function (event) {
         }
     });
 })
+
+var signOut = function () {
+    requestData("/api/Account/Logout", "POST", null, function () {
+        var tokenKey = "TokenKey";
+        var token = sessionStorage.removeItem(tokenKey);
+
+        window.location.assign("/");
+    });
+}

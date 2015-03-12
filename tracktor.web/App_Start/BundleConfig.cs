@@ -11,6 +11,7 @@ namespace tracktor.web
                         "~/Scripts/jquery-{version}.js",
                         "~/Scripts/modernizr-*",
                         "~/Scripts/bootstrap.js",
+                        "~/Scripts/bootbox.js",
                         "~/Scripts/respond.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tracktor").Include(

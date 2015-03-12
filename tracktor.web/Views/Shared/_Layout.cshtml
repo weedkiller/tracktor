@@ -18,9 +18,14 @@
                 @Html.ActionLink("tracktor", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
+                <ul class="nav navbar-nav navbar-right">
+                    @*<li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
+                        <li>@Html.ActionLink("sign out", "api/AccountIndex", "Help", new { area = "" }, null)</li>*@
+                    @if (ViewBag.User != null)
+                    {
+                        <li><a href="#">@ViewBag.User</a></li>
+                        <li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
+                    }
                 </ul>
             </div>
         </div>
@@ -29,7 +34,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - tracktor</p>
+            <p>&copy; @DateTime.Now.Year - <a href="https://github.com/rohatsu/tracktor">tracktor</a></p>
         </footer>
     </div>
 

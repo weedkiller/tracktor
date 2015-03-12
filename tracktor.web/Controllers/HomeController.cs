@@ -12,6 +12,7 @@ namespace tracktor.web.Controllers
         public ActionResult Index()
         {
             ViewBag.Title = "tracktor";
+            ViewBag.User = Request.GetOwinContext().Authentication.User.Identity.Name;
 
             return View();
         }

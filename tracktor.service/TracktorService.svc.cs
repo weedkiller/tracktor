@@ -28,6 +28,27 @@ namespace tracktor.service
                 var newUser = new TUser { Name = userName, LastTaskID = 0, CurrentState = TState.Idle };
                 _db.TUsers.Add(newUser);
                 _db.SaveChanges();
+
+                var newProject = new TProject
+                {
+                    DisplayOrder = 1,
+                    IsObsolete = false,
+                    Name = "Sample Project",
+                    TUserID = newUser.TUserID
+                };
+                _db.TProjects.Add(newProject);
+                _db.SaveChanges();
+
+                var newTask = new TTask
+                {
+                    DisplayOrder = 1,
+                    IsObsolete = false,
+                    Name = "Sample Task",
+                    TProjectID = newProject.TProjectID
+                };
+                _db.TTasks.Add(newTask);
+                _db.SaveChanges();
+
                 return newUser.TUserID;
             }
             catch (Exception ex)
@@ -41,7 +62,8 @@ namespace tracktor.service
             try
             {
                 TModelDto model = null;
-                model = new TModelDto {
+                model = new TModelDto
+                {
                     Projects = _db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList(),
                     Entries = GetEntries(context, null, null, 0, 20)
                 };
@@ -96,6 +118,12 @@ namespace tracktor.service
                             {
                                 if (entry.IsDeleted == true)
                                 {
+                                    // stop if in progress
+                                    if (!existingEntry.EndDate.HasValue)
+                                    {
+                                        StopTask(context, entry.TTaskID);
+                                        existingEntry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entry.TEntryID);
+                                    }
                                     _db.TEntries.Remove(existingEntry);
                                     _db.SaveChanges();
                                     return null;
@@ -105,14 +133,14 @@ namespace tracktor.service
                                     var startUtc = calculator.ToUtc(entry.StartDate).Value;
                                     var endUtc = calculator.ToUtc(entry.EndDate);
                                     var now = DateTime.UtcNow;
-                                    if(startUtc <= now && 
+                                    if (startUtc <= now &&
                                         (!endUtc.HasValue || (endUtc.HasValue && endUtc.Value <= now && endUtc.Value > startUtc)))
                                     {
                                         existingEntry.StartDate = startUtc;
                                         existingEntry.EndDate = endUtc;
                                         _db.SaveChanges();
                                     }
-                                }                                
+                                }
                             }
                             return calculator.EnrichTEntry(null, existingEntry);
                         }
