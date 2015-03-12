@@ -74,36 +74,34 @@ var projectMapping = function (data) {
 };
 
 var startTask = function (taskId: number) {
-    requestData("/api/Tracktor/StartTask", "POST", {
+    requestData("api/Tracktor/StartTask", "POST", {
         newTaskID: taskId
     }, updateHomeModel);
 }
 
 var switchTask = function (taskId: number) {
-    requestData("/api/Tracktor/SwitchTask", "POST", {
-        currentTaskID: viewModel.TTaskInProgress.TTaskID,
+    requestData("api/Tracktor/SwitchTask", "POST", {
+        currentTaskID: statusModel.TTaskInProgress.TTaskID,
         newTaskID: taskId
     }, updateHomeModel);
 }
 
 var stopTask = function (taskId: number) {
-    requestData("/api/Tracktor/StopTask", "POST", {
+    requestData("api/Tracktor/StopTask", "POST", {
         currentTaskID: taskId
     }, updateHomeModel);
 }
 
 var saveEntry = function () {
     $('#IsDeleted').val("false");
-    requestData("/api/Tracktor/UpdateEntry", "POST",
+    requestData("api/Tracktor/UpdateEntry", "POST",
         $("#entryEditForm").serialize(),
-        function (data) {
-            updateEditingEntry(ko.mapping.fromJS(data))
-        });
+        updateHomeModel);
 }
 
 var deleteEntry = function () {
     $('#IsDeleted').val("true");
-    requestData("/api/Tracktor/UpdateEntry", "POST",
+    requestData("api/Tracktor/UpdateEntry", "POST",
         $("#entryEditForm").serialize(),
         function (data) {
             refreshModel();
@@ -152,34 +150,69 @@ var rootMapping = {
     }
 };
 
-var viewModel;
+var summaryModel;
+var statusModel;
+var entriesModel;
+var reportModel;
+var editModel;
 
 var updateTitle = function () {
-    if (viewModel.InProgress()) {
-        document.title = "tr: " + viewModel.LatestEntry.ProjectName() + " / " + viewModel.LatestEntry.TaskName();
+    if (statusModel.InProgress()) {
+        document.title = "tr: " + statusModel.LatestEntry.ProjectName() + " / " + statusModel.LatestEntry.TaskName();
     } else {
         document.title = "tracktor (idle)";
     }
 }
 
 var bindHomeModel = function (data) {
-    viewModel = ko.mapping.fromJS(data, rootMapping);
-    ko.applyBindings(viewModel);
+    summaryModel = ko.mapping.fromJS(data.SummaryModel, rootMapping);
+    ko.applyBindings(summaryModel, document.getElementById('SummaryModel'));
+
+    statusModel = ko.mapping.fromJS(data.StatusModel);
+    ko.applyBindings(statusModel, document.getElementById('StatusModel'));
+
+    entriesModel = ko.mapping.fromJS(data.EntriesModel);
+    ko.applyBindings(entriesModel, document.getElementById('EntriesModel'));
+
+    reportModel = ko.mapping.fromJS(data.ReportModel);
+    ko.applyBindings(reportModel, document.getElementById('ReportModel'));
+
+    editModel = ko.mapping.fromJS(data.EditModel);
+    ko.applyBindings(editModel, document.getElementById('EditModel'));
+
     updateTitle();
     $('.curtain').removeClass('curtain');
+    $('.nocurtain').remove();
     timerFunc();
 };
 
 var updateHomeModel = function (data) {
-    ko.mapping.fromJS(data, rootMapping, viewModel);
-    updateTitle();
+    if (data.SummaryModel) {
+        ko.mapping.fromJS(data.SummaryModel, rootMapping, summaryModel);
+    }
+    if (data.StatusModel) {
+        ko.mapping.fromJS(data.StatusModel, {}, statusModel);
+        updateTitle();
+    }
+    if (data.EntriesModel) {
+        ko.mapping.fromJS(data.EntriesModel, {}, entriesModel);
+    }
+    if (data.ReportModel) {
+        ko.mapping.fromJS(data.ReportModel, {}, reportModel);
+    }
+    if (data.EditModel) {
+        ko.mapping.fromJS(data.EditModel, {}, editModel);
+    }
 };
 
 var refreshModel = function () {
     requestData("api/Tracktor/GetModel", "GET", {}, updateHomeModel);
 };
 
-var initializeModel = function () {
+var _urlRoot = "";
+
+var initializeModel = function (urlRoot: string) {
+    _urlRoot = urlRoot;
     requestData("api/Tracktor/GetModel", "GET", {}, bindHomeModel);
 };
 
@@ -189,7 +222,7 @@ var requestData = function (url: string, method: string, data: any, callback: (a
 
     if (token === "") {
         alert("Authorization expired, please sign in.");
-        window.location.assign("/Home/SignIn");
+        window.location.assign(_urlRoot + "Home/SignIn");
     }
     var headers: { [key: string]: any; } = {
         Authorization: 'Bearer ' + token
@@ -197,12 +230,14 @@ var requestData = function (url: string, method: string, data: any, callback: (a
 
     var settings: JQueryAjaxSettings = {
         type: method,
-        url: url,
+        url: _urlRoot + url,
         data: data,
         headers: headers
     };
 
+    disableButtons();
     $.ajax(settings).done(callback);
+    enableButtons();
 }
 
 var timeTick = 1;
@@ -211,14 +246,19 @@ $.ajaxSetup({
     statusCode: {
         401: function () {
             alert("Authorization expired, please sign in.");
-            window.location.assign("/Home/SignIn");
+            window.location.assign(_urlRoot + "Home/SignIn");
+            enableButtons();
+        },
+        default: function (data) {
+            alert("Error: " + data.statusText);
+            enableButtons();
         }
     }
 });
 
 var timerFunc = function () {
-    if (viewModel.InProgress()) {
-        viewModel.Projects().forEach(function (p) {
+    if (statusModel.InProgress()) {
+        summaryModel.Projects().forEach(function (p) {
             p.TTasks().forEach(function (t) {
                 if (t.InProgress()) {
                     var today = t.Contrib.Today();
@@ -231,44 +271,44 @@ var timerFunc = function () {
             });
         });
 
-        viewModel.Entries().forEach(function (t) {
+        entriesModel.Entries().forEach(function (t) {
             if (t.InProgress()) {
                 var contrib = t.Contrib();
                 t.Contrib(contrib + timeTick);
             }
         });
 
-        var current = viewModel.LatestEntry.Contrib();
-        viewModel.LatestEntry.Contrib(current + timeTick);
+        var current = statusModel.LatestEntry.Contrib();
+        statusModel.LatestEntry.Contrib(current + timeTick);
     }
     setTimeout(timerFunc, 1000);
 }
 
 var updateEditingEntry = function (data) {
-    viewModel.EditingEntry(data);
+    entriesModel.EditingEntry(data);
 }
 
-$('#entryEditModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var entryId = button.data('entryid') // Extract info from data-* attributes
-    var modal = $(this)
-
-    viewModel.Entries().forEach(function (e) {
-        if (e.TEntryID() == entryId) {
-            modal.find('.modal-title').text('Edit entry for ' + e.TaskName())
-            var copyOfE = jQuery.extend({}, e);
-            copyOfE.StartDate = e.StartDate();
-            copyOfE.EndDate = e.EndDate();
-            updateEditingEntry(copyOfE);
-        }
+var editEntry = function (entryId)
+{
+    requestData("api/Tracktor/GetEntry", "GET", { entryID: entryId }, function (data) {
+        updateHomeModel(data);
+        $("#entryEditModal").modal();
     });
-})
+}
 
 var signOut = function () {
-    requestData("/api/Account/Logout", "POST", null, function () {
+    requestData("api/Account/Logout", "POST", null, function () {
         var tokenKey = "TokenKey";
         var token = sessionStorage.removeItem(tokenKey);
 
         window.location.assign("/");
     });
+}
+
+var disableButtons = function () {
+    $("button").prop("disabled", true);
+}
+
+var enableButtons = function () {
+    $("button").prop("disabled", false);
 }

@@ -15,7 +15,16 @@ namespace tracktor.service
         int CreateUser(string userName);
 
         [OperationContract]
-        TModelDto GetModel(TContextDto context);
+        TSummaryModelDto GetSummaryModel(TContextDto context);
+
+        [OperationContract]
+        TStatusModelDto GetStatusModel(TContextDto context);
+
+        [OperationContract]
+        TEntriesModelDto GetEntriesModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int startNo, int maxEntries);
+
+        [OperationContract]
+        TReportModelDto GetReportModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID);
 
         [OperationContract]
         TTaskDto UpdateTask(TContextDto context, TTaskDto task);
@@ -24,13 +33,10 @@ namespace tracktor.service
         TProjectDto UpdateProject(TContextDto context, TProjectDto project);
 
         [OperationContract]
+        TEntryDto GetEntry(TContextDto context, int entryID);
+
+        [OperationContract]
         TEntryDto UpdateEntry(TContextDto context, TEntryDto entry);
-
-        [OperationContract]
-        List<TEntryDto> GetEntries(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int maxEntries);
-
-        [OperationContract]
-        TracktorReportDto GetReport(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID);
 
         [OperationContract]
         void StopTask(TContextDto context, int currentTaskID);

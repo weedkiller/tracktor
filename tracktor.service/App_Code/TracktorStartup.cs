@@ -25,7 +25,7 @@ namespace tracktor.service
                 dst.IsDeleted = false;
             });
 
-            Mapper.CreateMap<TracktorReport, TracktorReportDto>();
+            Mapper.CreateMap<TracktorReport, TReportModelDto>();
         }
     }
 }

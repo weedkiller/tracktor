@@ -29,22 +29,40 @@ namespace tracktor.service
     }
 
     [DataContract]
-    public class TModelDto
+    public class TSummaryModelDto
     {
         [DataMember]
         public List<TProjectDto> Projects { get; set; }
 
         [DataMember]
-        public List<TEntryDto> Entries { get; set; }
+        public bool InProgress { get; set; }
+    }
 
+    [DataContract]
+    public class TStatusModelDto
+    {
         [DataMember]
         public bool InProgress { get; set; }
 
         [DataMember]
-        public TTaskDto TTaskInProgress {  get; set; }
+        public TTaskDto TTaskInProgress { get; set; }
 
         [DataMember]
         public TEntryDto LatestEntry { get; set; }
+    }
+
+    [DataContract]
+    public class TEditModelDto
+    {
+        [DataMember]
+        public TEntryDto Entry { get; set; }
+    }
+
+    [DataContract]
+    public class TEntriesModelDto
+    {
+        [DataMember]
+        public List<TEntryDto> Entries { get; set; }
     }
 
     [DataContract]
@@ -107,7 +125,7 @@ namespace tracktor.service
     }
 
     [DataContract]
-    public class TracktorReportDto
+    public class TReportModelDto
     {
         [DataMember]
         public Dictionary<DateTime, double> DayContribs { get; set; }

@@ -9,12 +9,13 @@ using System.Web.Http;
 using Microsoft.Owin;
 using Microsoft.AspNet.Identity.Owin;
 using tracktor.service;
+using tracktor.web.Models;
 
 namespace tracktor.web.Controllers
 {
     public class TracktorEntryAction
     {
-        public int currentTaskID {  get; set; }
+        public int currentTaskID { get; set; }
         public int newTaskID { get; set; }
     }
 
@@ -34,7 +35,8 @@ namespace tracktor.web.Controllers
                 {
                     userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone);
                 }
-                return new TContextDto {
+                return new TContextDto
+                {
                     TUserID = userID,
                     UTCOffset = -(int)userTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes
                 };
@@ -42,9 +44,36 @@ namespace tracktor.web.Controllers
         }
 
         [HttpGet]
-        public TModelDto GetModel()
+        public TracktorWebModel GetModel(bool updateOnly = false)
         {
-            return _service.GetModel(Context);
+            return new TracktorWebModel
+            {
+                SummaryModel = _service.GetSummaryModel(Context),
+                EntriesModel = _service.GetEntriesModel(Context, null, null, 0, 0, 20),
+                StatusModel = _service.GetStatusModel(Context),
+                EditModel = updateOnly ? null : new TEditModelDto
+                {
+                    Entry = new TEntryDto
+                    {
+                        EndDate = DateTime.UtcNow,
+                        StartDate = DateTime.UtcNow,
+                        IsDeleted = false,
+                        InProgress = false,
+                        TaskName = "",
+                        ProjectName = "",
+                        TTaskID = 0,
+                        TEntryID = 0,
+                        Contrib = 0,
+                    }
+                },
+                ReportModel = updateOnly ? null : new TReportModelDto
+                {
+                    StartDate = DateTime.UtcNow,
+                    EndDate = DateTime.UtcNow,
+                    DayContribs = new Dictionary<DateTime, double> { { DateTime.UtcNow.Date, 0 } },
+                    TaskContribs = new Dictionary<int, double> { { 0, 0 } }
+                }
+            };
         }
 
         [HttpPost]
@@ -60,42 +89,66 @@ namespace tracktor.web.Controllers
         }
 
         [HttpPost]
-        public TEntryDto UpdateEntry(TEntryDto entry)
+        public TracktorWebModel UpdateEntry(TEntryDto entry)
         {
-            return _service.UpdateEntry(Context, entry);
+            return new TracktorWebModel
+            {
+                EditModel = new TEditModelDto
+                {
+                    Entry = _service.UpdateEntry(Context, entry)
+                }
+            };
         }
 
         [HttpGet]
-        public List<TEntryDto> GetEntries(DateTime? startDate, DateTime? endDate, int projectID, int maxEntries)
+        public TracktorWebModel GetEntry(int entryID)
         {
-            return _service.GetEntries(Context, startDate, endDate, projectID, maxEntries);
+            return new TracktorWebModel
+            {
+                EditModel = new TEditModelDto
+                {
+                    Entry = _service.GetEntry(Context, entryID)
+                }
+            };
         }
 
         [HttpGet]
-        public TracktorReportDto GetReport(DateTime? startDate, DateTime? endDate, int projectID)
+        public TracktorWebModel GetEntriesModel(DateTime? startDate, DateTime? endDate, int projectID, int startNo, int maxEntries)
         {
-            return _service.GetReport(Context, startDate, endDate, projectID);
+            return new TracktorWebModel
+            {
+                EntriesModel = _service.GetEntriesModel(Context, startDate, endDate, projectID, startNo, maxEntries)
+            };
+        }
+
+        [HttpGet]
+        public TracktorWebModel GetReportModel(DateTime? startDate, DateTime? endDate, int projectID)
+        {
+            return new TracktorWebModel
+            {
+                ReportModel = _service.GetReportModel(Context, startDate, endDate, projectID)
+            };
         }
 
         [HttpPost]
-        public TModelDto StopTask(TracktorEntryAction actionModel)
+        public TracktorWebModel StopTask(TracktorEntryAction actionModel)
         {
             _service.StopTask(Context, actionModel.currentTaskID);
-            return _service.GetModel(Context);
+            return GetModel(true);
         }
 
         [HttpPost]
-        public TModelDto StartTask(TracktorEntryAction actionModel)
+        public TracktorWebModel StartTask(TracktorEntryAction actionModel)
         {
             _service.StartTask(Context, actionModel.newTaskID);
-            return _service.GetModel(Context);
+            return GetModel(true);
         }
 
         [HttpPost]
-        public TModelDto SwitchTask(TracktorEntryAction actionModel)
+        public TracktorWebModel SwitchTask(TracktorEntryAction actionModel)
         {
             _service.SwitchTask(Context, actionModel.currentTaskID, actionModel.newTaskID);
-            return _service.GetModel(Context);
+            return GetModel(true);
         }
 
         protected override void Dispose(bool disposing)

@@ -51,7 +51,7 @@ namespace tracktor.service
             return null;
         }
 
-        public List<TEntry> GetEntries(DateTime? startDate, DateTime endDate, int projectID, int maxEntries = 0)
+        public List<TEntry> GetEntries(DateTime? startDate, DateTime endDate, int projectID, int startNo = 0, int maxEntries = -1)
         {
             Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
             Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
@@ -66,6 +66,7 @@ namespace tracktor.service
                 .Where(e => !(utcStart.HasValue && e.EndDate.HasValue && e.EndDate < utcStart)
                             && !(e.StartDate > utcEnd))
                 .OrderByDescending(e => e.EndDate.HasValue ? e.EndDate.Value : e.StartDate)
+                .Skip(startNo)
                 .Take(maxEntries <= 0 ? MaxEntries : maxEntries).ToList();
         }
 
@@ -105,7 +106,7 @@ namespace tracktor.service
         }
 
         public TEntryDto EnrichTEntry(TEntryDto entryDto, TEntry entry)
-        { 
+        {
             var dto = entryDto;
             if (dto == null)
             {
@@ -125,20 +126,39 @@ namespace tracktor.service
             {
                 dto.ProjectName = entry.TTask.TProject.Name;
             }
-            if(dto.Contrib == 0)
+            if (dto.Contrib == 0)
             {
                 dto.Contrib = (DateOrLocalNow(dto.EndDate) - dto.StartDate).TotalSeconds;
             }
             return dto;
         }
 
-        public void CalculateContribs(DateTime? startDate, DateTime endDate, TModelDto model)
+        public TStatusModelDto BuildStatusModel()
+        {
+            var entries = _db.TEntries.Where(e => e.TTask.TProject.TUserID == mContext.TUserID);
+            var entryInProgress = entries.SingleOrDefault(e => !e.EndDate.HasValue);
+            var latestEntry = entries.OrderByDescending(e => e.StartDate).FirstOrDefault();
+
+            return new TStatusModelDto
+            {
+                InProgress = (entryInProgress != null),
+                LatestEntry = EnrichTEntry(null, latestEntry),
+                TTaskInProgress = (entryInProgress != null) ? Mapper.Map<TTaskDto>(entryInProgress.TTask) : null
+            };
+        }
+
+        public TSummaryModelDto BuildSummaryModel(DateTime? startDate, DateTime endDate)
         {
             Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
             Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
+
+            var model = new TSummaryModelDto
+            {
+                Projects = _db.TProjects.Where(p => p.TUserID == mContext.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList()
+            };
+
             var taskToProject = model.Projects.SelectMany(p => p.TTasks.Select(t => new KeyValuePair<int, int>(t.TTaskID, t.TProjectID))).ToDictionary(t => t.Key, p => p.Value);
             List<TEntry> entries = GetEntries(startDate, endDate, 0);
-            var entriesById = model.Entries.ToDictionary(e => e.TEntryID, e => e);
             foreach (var taskEntry in entries.GroupBy(e => e.TTaskID))
             {
                 if (taskToProject.ContainsKey(taskEntry.Key))
@@ -153,26 +173,11 @@ namespace tracktor.service
                             foreach (var entry in taskEntry)
                             {
                                 var totalContrib = BucketEntry(entry, report);
-
-                                // find it individually
-                                TEntryDto entryDto;
-                                if (entriesById.TryGetValue(entry.TEntryID, out entryDto))
+                                if (!entry.EndDate.HasValue)
                                 {
-                                    entryDto.TaskName = taskDto.Name;
-                                    entryDto.ProjectName = projectDto.Name;
-                                    
-                                    // convert to local time
-                                    entryDto = EnrichTEntry(entryDto, entry);
-                                    entryDto.Contrib = totalContrib;
-
-                                    if (!entry.EndDate.HasValue)
-                                    {
-                                        entryDto.InProgress = true;
-                                        taskDto.InProgress = true;
-                                        projectDto.InProgress = true;
-                                        model.InProgress = true;
-                                        model.TTaskInProgress = taskDto;
-                                    }
+                                    taskDto.InProgress = true;
+                                    projectDto.InProgress = true;
+                                    model.InProgress = true;
                                 }
                             }
                             taskDto.Contrib = report.GetContrib();
@@ -181,28 +186,31 @@ namespace tracktor.service
                 }
             }
 
-            // latest entry (active or not)
-            var latestEntry = model.Entries.FirstOrDefault();
-            if (latestEntry == null)
-            {
-                latestEntry = new TEntryDto {
-                    TEntryID = 0,
-                    InProgress = false,
-                    TaskName = "(n/a)",
-                    Contrib = 0
-                };
-            }
-            model.LatestEntry = latestEntry;
+            return model;
+        }
 
-            // dummy task for model binding
-            if (!model.InProgress)
+        public List<TEntryDto> CalculateEntryContribs(List<TEntry> entries, DateTime? startDate, DateTime endDate)
+        {
+            Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
+            Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
+
+            var dtos = new List<TEntryDto>();
+            var descriptions = _db.TTasks.Where(t => t.TProject.TUserID == mContext.TUserID).Select(t => new { TTaskID = t.TTaskID, TaskName = t.Name, ProjectName = t.TProject.Name }).
+                ToDictionary(t => t.TTaskID, t => t);
+            var report = new TracktorReport(startDate, endDate);
+
+            foreach (var entry in entries)
             {
-                model.TTaskInProgress = new TTaskDto {
-                    InProgress = false,
-                    TTaskID = 0,
-                    Name = "n/a"
-                };
+                var entryDto = Mapper.Map<TEntryDto>(entry);
+                var description = descriptions[entry.TTaskID];
+                entryDto.TaskName = description.TaskName;
+                entryDto.ProjectName = description.ProjectName;
+                entryDto.Contrib = BucketEntry(entry, report);
+                entryDto.InProgress = (!entry.EndDate.HasValue);
+                dtos.Add(entryDto);
             }
+
+            return dtos;
         }
 
         #region IDisposable Members

@@ -19,8 +19,6 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    @*<li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
-                        <li>@Html.ActionLink("sign out", "api/AccountIndex", "Help", new { area = "" }, null)</li>*@
                     @if (ViewBag.User != null)
                     {
                         <li><a href="#">@ViewBag.User</a></li>

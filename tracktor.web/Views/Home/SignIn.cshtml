@@ -74,7 +74,7 @@
             }
         });
 
-        var signIn = function () {
+        var signIn = function () {            
             internalSignIn($('#username').val(), $('#password').val());
         }
 
@@ -90,6 +90,7 @@
                 return;
             }
 
+            $('#signinbutton').prop("disabled", true);
             $.ajax({
                 type: 'POST',
                 url: '@Url.Action("", "Token")',
@@ -99,6 +100,7 @@
                 window.location.assign('@Url.Action("Index","Home")');
             }).fail(function (data) {
                 bootbox.alert(data.responseJSON.error_description);
+                $('#signinbutton').prop("disabled", false);
             });
         }
 
@@ -121,6 +123,7 @@
                 return;
             }
 
+            $('#registerbutton').prop("disabled", true);
             $.ajax({
                 type: 'POST',
                 url: '@Url.Action("Register", "api/Account")',
@@ -137,9 +140,11 @@
                         }
                     }
                     bootbox.alert(errors);
+                    $('#registerbutton').prop("disabled", false);
                 }
                 else {
                     bootbox.alert(data.responseJSON.Message);
+                    $('#registerbutton').prop("disabled", false);
                 }
             });
         }

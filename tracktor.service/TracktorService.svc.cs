@@ -57,21 +57,48 @@ namespace tracktor.service
             }
         }
 
-        public TModelDto GetModel(TContextDto context)
+        public TSummaryModelDto GetSummaryModel(TContextDto context)
         {
             try
             {
-                TModelDto model = null;
-                model = new TModelDto
-                {
-                    Projects = _db.TProjects.Where(p => p.TUserID == context.TUserID).ToList().Select(p => Mapper.Map<TProjectDto>(p)).ToList(),
-                    Entries = GetEntries(context, null, null, 0, 20)
-                };
                 using (var calc = new TracktorCalculator(context))
                 {
-                    calc.CalculateContribs(null, calc.DateOrLocalNow(null), model);
+                    return calc.BuildSummaryModel(null, calc.DateOrLocalNow(null));
                 }
-                return model;
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TStatusModelDto GetStatusModel(TContextDto context)
+        {
+            try
+            {
+                using (var calc = new TracktorCalculator(context))
+                {
+                    return calc.BuildStatusModel();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TEntriesModelDto GetEntriesModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int startNo, int maxEntries)
+        {
+            try
+            {
+                using (var calc = new TracktorCalculator(context))
+                {
+                    var entries = calc.GetEntries(startDate, calc.DateOrLocalNow(endDate), projectID, startNo, maxEntries);
+                    return new TEntriesModelDto
+                    {
+                        Entries = calc.CalculateEntryContribs(entries, startDate, calc.DateOrLocalNow(endDate))
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -96,6 +123,22 @@ namespace tracktor.service
             try
             {
                 return UpdateObject<TProjectDto, TProject>(context, project, _db.TProjects, (t => t.TProjectID == project.TProjectID));
+            }
+            catch (Exception ex)
+            {
+                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        public TEntryDto GetEntry(TContextDto context, int entryID)
+        {
+            try
+            {
+                using (var calc = new TracktorCalculator(context))
+                {
+                    var entry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entryID && e.TTask.TProject.TUserID == context.TUserID);
+                    return calc.EnrichTEntry(null, entry);
+                }
             }
             catch (Exception ex)
             {
@@ -154,28 +197,13 @@ namespace tracktor.service
             }
         }
 
-        public List<TEntryDto> GetEntries(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int maxEntries)
+        public TReportModelDto GetReportModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID)
         {
             try
             {
                 using (var calculator = new TracktorCalculator(context))
                 {
-                    return calculator.GetEntries(startDate, calculator.DateOrLocalNow(endDate), projectID, maxEntries).Select(e => Mapper.Map<TEntryDto>(e)).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
-            }
-        }
-
-        public TracktorReportDto GetReport(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID)
-        {
-            try
-            {
-                using (var calculator = new TracktorCalculator(context))
-                {
-                    return Mapper.Map<TracktorReportDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID));
+                    return Mapper.Map<TReportModelDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID));
                 }
             }
             catch (Exception ex)

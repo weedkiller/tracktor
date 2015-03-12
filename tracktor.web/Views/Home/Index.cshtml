@@ -1,6 +1,9 @@
 ﻿<div class="container " style="max-width: 1000px; margin: 15px auto 20px auto;">
-    <div class="top curtain">
-        <!-- ko if: $root.InProgress -->
+    <div class="top nocurtain" style="margin: 65px;">
+        Loading....
+    </div>
+    <div class="top curtain" id="StatusModel">
+        <!-- ko if: InProgress -->
         <div class="topheader bg-danger">
             <table style="width: 100%;">
                 <tr>
@@ -8,10 +11,10 @@
                     <td style="width: 40%; text-align: center;"><h4 style="margin: 0;"><span class="glyphicon glyphicon-file" aria-hidden="true" style="font-size:14px;"></span>&nbsp;&nbsp;<span data-bind="text: LatestEntry.ProjectName"></span> / <span data-bind="text: LatestEntry.TaskName"></span></h4></td>
                     <td style="width: 20%; text-align: center;"><h4 style="margin: 0;"><span class="glyphicon glyphicon-time" aria-hidden="true" style="font-size:14px;"></span>&nbsp;&nbsp;<span data-bind="text: timeSpanFull(LatestEntry.Contrib())"></span></h4></td>
                     <td style="width: 20%; text-align: right;">
-                        <button class="btn btn-xs btn-default summarybutton" data-bind="attr: { 'data-entryid': $root.LatestEntry.TEntryID() }" data-toggle="modal" data-target="#entryEditModal">
+                        <button class="btn btn-xs btn-default summarybutton" data-bind="click: editEntry.bind($data, LatestEntry.TEntryID())">
                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;&nbsp;Edit&nbsp;&nbsp;
                         </button>
-                        <button class="btn btn-xs btn-danger summarybutton" data-bind="click: stopTask.bind($data, $root.LatestEntry.TTaskID())">
+                        <button class="btn btn-xs btn-danger summarybutton" data-bind="click: stopTask.bind($data, LatestEntry.TTaskID())">
                             <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>&nbsp;&nbsp;Stop&nbsp;&nbsp;
                         </button>
                     </td>
@@ -19,7 +22,7 @@
             </table>
         </div>
         <!-- /ko -->
-        <!-- ko ifnot: $root.InProgress -->
+        <!-- ko ifnot: InProgress -->
         <div class="topheader bg-success">
             <table style="width: 100%;">
                 <tr>
@@ -27,10 +30,10 @@
                     <td style="width: 40%; text-align: center;"><h4 style="margin: 0;"><span class="glyphicon glyphicon-file" aria-hidden="true" style="font-size:14px;"></span>&nbsp;&nbsp;<span data-bind="text: LatestEntry.ProjectName"></span> / <span data-bind="text: LatestEntry.TaskName"></span></h4></td>
                     <td style="width: 20%; text-align: center;"><h4 style="margin: 0;"><span class="glyphicon glyphicon-time" aria-hidden="true" style="font-size:14px;"></span>&nbsp;&nbsp;<span data-bind="text: timeSpanFull(LatestEntry.Contrib())"></span></h4></td>
                     <td style="width: 20%; text-align: right;">
-                        <button class="btn btn-xs btn-default summarybutton" data-bind="attr: { 'data-entryid': $root.LatestEntry.TEntryID() }" data-toggle="modal" data-target="#entryEditModal">
+                        <button class="btn btn-xs btn-default summarybutton" data-bind="click: editEntry.bind($data, LatestEntry.TEntryID())">
                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;&nbsp;Edit&nbsp;&nbsp;
                         </button>
-                        <button class="btn btn-xs btn-success summarybutton" data-bind="click: startTask.bind($data, $root.LatestEntry.TTaskID())">
+                        <button class="btn btn-xs btn-success summarybutton" data-bind="click: startTask.bind($data, LatestEntry.TTaskID())">
                             <span class="glyphicon glyphicon-play" aria-hidden="true"></span>&nbsp;&nbsp;Start&nbsp;&nbsp;
                         </button>
                     </td>
@@ -40,17 +43,17 @@
         <!-- /ko -->
     </div>
 
-    <div role="tabpanel">
+    <div role="tabpanel" class="curtain">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;&nbsp;Summary</a></li>
+            <li role="presentation" class="active"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;&nbsp;Summary</a></li>
             <li role="presentation"><a href="#log" aria-controls="report" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list" aria-hidden="true"></span>&nbsp;&nbsp;Log</a></li>
             <li role="presentation"><a href="#report" aria-controls="report" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>&nbsp;&nbsp;Report</a></li>
         </ul>
 
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="home">
+            <div role="tabpanel" class="tab-pane active" id="summary">
                 <div class="curtain tabcontent">
-                    <table class="table table-condensed table-hover">
+                    <table class="table table-condensed table-hover" id="SummaryModel">
                         <thead>
                             <tr class="emphasis">
                                 <th class="center" style="width: 100px;">Project</th>
@@ -119,7 +122,7 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="log">
                 <div class="tabcontent">
-                    <table class="table table-condensed">
+                    <table class="table table-condensed" id="EntriesModel">
                         <thead>
                             <tr class="emphasis">
                                 <th class="center" style="width: 120px;">Start</th>
@@ -138,7 +141,7 @@
                                 <td data-bind="text: TaskName"></td>
                                 <td class="contrib" data-bind="text: timeSpan(Contrib())"></td>
                                 <td class="center">
-                                    <button class="btn btn-xs btn-default summarybutton" data-bind="attr: { 'data-entryid': TEntryID() }" data-toggle="modal" data-target="#entryEditModal">
+                                    <button class="btn btn-xs btn-default summarybutton" data-bind="click: editEntry.bind($data, TEntryID())">
                                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;&nbsp;Edit&nbsp;&nbsp;
                                     </button>
                                 </td>
@@ -149,7 +152,21 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="report">
                 <div class="tabcontent">
-                    report
+                    <table class="table table-bordered" style="width: 80%; margin: 0 auto;" id="ReportModel">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center; width: 90px;">Mon</th>
+                                <th style="text-align: center; width: 90px;">Tue</th>
+                                <th style="text-align: center; width: 90px;">Wed</th>
+                                <th style="text-align: center; width: 90px;">Thu</th>
+                                <th style="text-align: center; width: 90px;">Fri</th>
+                                <th style="text-align: center; width: 90px; color: red;">Sat</th>
+                                <th style="text-align: center; width: 90px; color: red;">Sun</th>
+                                <th style="text-align: center; width: 90px;">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -157,7 +174,7 @@
 </div>
 
 <div class="modal" id="entryEditModal" tabindex="-1" role="dialog" aria-labelledby="entryEditModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" id="EditModel">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -166,23 +183,23 @@
             <div class="modal-body">
                 <form id="entryEditForm">
                     <p>
-                        Project: <span data-bind="text: $root.EditingEntry().ProjectName" />
+                        Project: <span data-bind="text: Entry.ProjectName" />
                     </p>
                     <p>
-                        Task: <span data-bind="text: $root.EditingEntry().TaskName"/>
+                        Task: <span data-bind="text: Entry.TaskName" />
                     </p>
                     <p>
-                        Start: <input type="text" data-bind="value: $root.EditingEntry().StartDate" name="StartDate"/>
+                        Start: <input type="text" data-bind="value: Entry.StartDate" name="StartDate" />
                     </p>
                     <p>
-                        End: <input type="text" data-bind="value: $root.EditingEntry().EndDate" name="EndDate"/>
+                        End: <input type="text" data-bind="value: Entry.EndDate" name="EndDate" />
                     </p>
                     <p>
-                        Contrib: <span data-bind="text: timeSpanFull($root.EditingEntry().Contrib())" />
+                        Contrib: <span data-bind="text: timeSpanFull(Entry.Contrib())" />
                     </p>
-                    <input type="hidden" data-bind="value: $root.EditingEntry().TEntryID" name="TEntryID"/>
-                    <input type="hidden" data-bind="value: $root.EditingEntry().TTaskID" name="TTaskID" />
-                    <input type="hidden" id="IsDeleted" name="IsDeleted" value="false"/>
+                    <input type="hidden" data-bind="value: Entry.TEntryID" name="TEntryID" />
+                    <input type="hidden" data-bind="value: Entry.TTaskID" name="TTaskID" />
+                    <input type="hidden" id="IsDeleted" name="IsDeleted" value="false" />
                 </form>
             </div>
             <div class="modal-footer">
@@ -198,6 +215,6 @@
     @Scripts.Render("~/bundles/tracktor")
 
     <script type="text/javascript">
-        initializeModel();
+        initializeModel("");
     </script>
 }
