@@ -12,7 +12,9 @@ namespace tracktor.web
                         "~/Scripts/modernizr-*",
                         "~/Scripts/bootstrap.js",
                         "~/Scripts/bootbox.js",
-                        "~/Scripts/respond.js"));
+                        "~/Scripts/respond.js",
+                        "~/Scripts/moment.js",
+                        "~/Scripts/bootstrap-datetimepicker.min.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tracktor").Include(
                         "~/Scripts/knockout-{version}.js",
@@ -21,6 +23,7 @@ namespace tracktor.web
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/bootstrap-datetimepicker.min.css",
                       "~/Content/site.css"));
         }
     }

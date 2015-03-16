@@ -338,7 +338,7 @@ namespace tracktor.web.Controllers
             {
                 try
                 {
-                    var service = new TracktorService();
+                    var service = new TracktorService(); // TODO: use MEF
                     int userId = service.CreateUser(model.Email);
                     user.TUserID = userId;
                     result = await UserManager.UpdateAsync(user);

@@ -10,7 +10,7 @@ namespace tracktor.web.Controllers
 {
     public class HomeController : Controller
     {
-        private ITracktorService _service = new TracktorService(); // load locally, but can replace with remote invocation
+        private ITracktorService _service = new TracktorService(); // TODO: use MEF
 
         [Authorize]
         public ActionResult Index()
@@ -35,7 +35,7 @@ namespace tracktor.web.Controllers
             var entries = _service.GetEntriesModel(context, null, null, 0, 0, 99999);
 
             var csvFile = new StringBuilder();
-            csvFile.AppendLine("Start,End,Project,Task,Contribution,InProgress");
+            csvFile.AppendLine("Start,End,Project,Task,Hours,InProgress");
             foreach(var entry in entries.Entries)
             {
                 csvFile.AppendLine(
@@ -45,7 +45,7 @@ namespace tracktor.web.Controllers
                         entry.EndDate.HasValue ? entry.EndDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "",
                         entry.ProjectName,
                         entry.TaskName,
-                        (entry.Contrib / 60).ToString(),
+                        (entry.Contrib / 3600).ToString(), // hours
                         entry.InProgress ? "Yes" : "No"));
             }
             return File(

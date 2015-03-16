@@ -22,7 +22,7 @@ namespace tracktor.web.Controllers
     [Authorize]
     public class TracktorController : ApiController
     {
-        private ITracktorService _service = new TracktorService(); // load locally, but can replace with remote invocation
+        private ITracktorService _service = new TracktorService(); // TODO: use MEF
 
         public static TContextDto GetContext(IOwinContext owinContext)
         {

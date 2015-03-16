@@ -14,7 +14,7 @@ namespace tracktor.service
     {
         private readonly static int MaxEntries = 99999;
 
-        private TracktorContext _db = new TracktorContext();
+        private TracktorContext _db = new TracktorContext(); // TODO: use MEF
         protected TContextDto mContext;
 
         public TracktorCalculator(TContextDto context)

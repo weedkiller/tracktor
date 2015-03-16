@@ -18,7 +18,7 @@ namespace tracktor.service
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class TracktorService : ITracktorService, IDisposable
     {
-        private TracktorContext _db = new TracktorContext();
+        private TracktorContext _db = new TracktorContext(); // TODO: use MEF
 
         #region ITracktorService
 

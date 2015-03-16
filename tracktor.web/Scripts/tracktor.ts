@@ -1,5 +1,6 @@
 ﻿/// <reference path="typings/jquery/jquery.d.ts" />
 /// <reference path="typings/knockout.mapping/knockout.mapping.d.ts" />
+/// <reference path="typings/moment/moment.d.ts" />
 
 var padNumber = function (n: number) {
     var s = n.toString();
@@ -96,7 +97,10 @@ var saveEntry = function () {
     $('#IsDeleted').val("false");
     requestData("api/Tracktor/UpdateEntry", "POST",
         $("#entryEditForm").serialize(),
-        updateHomeModel);
+        function (data) {
+            updateHomeModel(data);
+            refreshModel();
+        });
 }
 
 var deleteEntry = function () {
@@ -202,18 +206,34 @@ var updateHomeModel = function (data) {
     }
     if (data.EditModel) {
         ko.mapping.fromJS(data.EditModel, {}, editModel);
+        // update datepickers
+        $("#EditStartDate").data("DateTimePicker").date(moment(editModel.Entry.StartDate()));
+        if (data.EditModel.Entry.EndDate != null) {
+            $("#EditEndDate").data("DateTimePicker").date(moment(editModel.Entry.EndDate()));
+        } else {
+            $("#EditEndDate").data("DateTimePicker").date(null);
+        }
     }
 };
 
 var refreshModel = function () {
+    hideReport();
     requestData("api/Tracktor/GetModel", "GET", {}, updateHomeModel);
 };
 
 var _urlRoot = "";
 
+var showReport = function () {
+    $(".reportcurtain").show();
+}
+
+var hideReport = function () {
+    $(".reportcurtain").hide();
+}
+
 var initializeModel = function (urlRoot: string) {
     _urlRoot = urlRoot;
-    $(".reportcurtain").hide();
+    hideReport();
     requestData("api/Tracktor/GetModel", "GET", {}, bindHomeModel);
 };
 
@@ -318,14 +338,28 @@ var generateReport = function () {
         month: $('#ReportMonth').val(),
         projectID: $('#ReportProject').val()
     };
-    $(".reportcurtain").hide();
+    hideReport();
     requestData("api/Tracktor/GetWebReport", "GET", data,
         function (data) {
             updateHomeModel(data);
-            $(".reportcurtain").show();
+            showReport();
     });
 }
 
 var downloadCSV = function () {
     window.location.assign(_urlRoot + "/Home/CSV");
+}
+
+var updateEditContrib = function () {
+    var startDate = moment(editModel.Entry.StartDate());
+    var endDate = editModel.Entry.EndDate();
+    if (endDate == null || endDate == "Invalid date") {
+        endDate = moment();
+    }
+    else {
+        endDate = moment(endDate);
+    }
+    endDate.subtract(startDate);
+    var duration = moment.duration(endDate);
+    editModel.Entry.Contrib(duration.asSeconds());
 }

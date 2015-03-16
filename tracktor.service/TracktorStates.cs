@@ -14,7 +14,7 @@ namespace tracktor.service
         protected TContextDto mContext;
         protected StateMachine<TState, TTrigger> mStateMachine;
 
-        private TracktorContext _db = new TracktorContext();
+        private TracktorContext _db = new TracktorContext(); // TODO: use MEF
         private StateMachine<TState, TTrigger>.TriggerWithParameters<int> _startTrigger;
         private StateMachine<TState, TTrigger>.TriggerWithParameters<int> _stopTrigger;
 
