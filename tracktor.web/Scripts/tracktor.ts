@@ -1,6 +1,7 @@
 ﻿/// <reference path="typings/jquery/jquery.d.ts" />
 /// <reference path="typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="typings/moment/moment.d.ts" />
+/// <reference path="typings/bootbox/bootbox.d.ts" />
 
 var padNumber = function (n: number) {
     var s = n.toString();
@@ -116,14 +117,6 @@ var rootModel = function (data) {
     ko.mapping.fromJS(data, rootMapping, this)
 };
 
-var editingEntry: any = ko.mapping.fromJS({
-    TaskName: "-",
-    ProjectName: "-",
-    Contrib: 0,
-    StartDate: 0,
-    EndDate: 0
-});
-
 var rootMapping = {
     'Projects': {
         create: function (options) {
@@ -149,7 +142,6 @@ var rootMapping = {
                 }, 0)
             }, viewModel)
         };
-        viewModel.EditingEntry = ko.observable(editingEntry);
         return viewModel;
     }
 };
@@ -159,6 +151,10 @@ var statusModel;
 var entriesModel;
 var reportModel;
 var editModel;
+
+var viewOptions = {
+    showObsolete: ko.observable(false)
+};
 
 var updateTitle = function () {
     if (statusModel.InProgress()) {
@@ -307,8 +303,7 @@ var updateEditingEntry = function (data) {
     entriesModel.EditingEntry(data);
 }
 
-var editEntry = function (entryId)
-{
+var editEntry = function (entryId) {
     requestData("api/Tracktor/GetEntry", "GET", { entryID: entryId }, function (data) {
         updateHomeModel(data);
         $("#entryEditModal").modal();
@@ -343,7 +338,7 @@ var generateReport = function () {
         function (data) {
             updateHomeModel(data);
             showReport();
-    });
+        });
 }
 
 var downloadCSV = function () {
@@ -362,4 +357,102 @@ var updateEditContrib = function () {
     endDate.subtract(startDate);
     var duration = moment.duration(endDate);
     editModel.Entry.Contrib(duration.asSeconds());
+}
+
+var newTask = function (projectId: number) {
+    bootbox.prompt({
+        message: "",
+        title: "Enter name for the new task:",
+        animate: false,
+        callback: function (result) {
+            if (result) {
+                requestData("/api/Tracktor/UpdateTask", "POST", {
+                    TProjectID: projectId,
+                    TTaskID: 0,
+                    Name: result
+                }, refreshModel);
+            }
+        }
+    });
+}
+
+var obsoleteTask = function (taskId: number, taskName: string) {
+    bootbox.confirm({
+        title: "Confirm task removal",
+        message: "Are you sure you'd like to remove task " + taskName + "?",
+        animate: false,
+        callback: function (result) {
+            if (result) {
+                requestData("/api/Tracktor/UpdateTask", "POST", {
+                    TTaskID: taskId,
+                    IsObsolete: true
+                }, refreshModel);
+            }
+        }
+    });
+}
+
+var newProject = function () {
+    bootbox.prompt({
+        message: "",
+        title: "Enter name for the new project:",
+        animate: false,
+        callback: function (result) {
+            if (result) {
+                requestData("/api/Tracktor/UpdateProject", "POST", {
+                    Name: result
+                }, refreshModel);
+            }
+        }
+    });
+}
+
+var obsoleteProject = function (projectId: number, projectName: string) {
+    bootbox.confirm({
+            title: "Confirm project removal",
+            message: "Are you sure you'd like to remove project " + projectName + "?",
+            animate: false,
+            callback: function (result) {
+                if (result) {
+                    requestData("/api/Tracktor/UpdateProject", "POST", {
+                        TProjectID: projectId,
+                        IsObsolete: true
+                    }, refreshModel);
+                }
+            }
+    });
+}
+
+var renameProject = function (projectId: number, projectName: string) {
+    bootbox.prompt({
+        message: "",
+        title: "Enter new name for the project:",
+        value: projectName,
+        animate: false,
+        callback: function (result) {
+            if (result) {
+                requestData("/api/Tracktor/UpdateProject", "POST", {
+                    TProjectID: projectId,
+                    Name: result
+                }, refreshModel);
+            }
+        }
+    });
+}
+
+var renameTask = function (taskId: number, taskName: string) {
+    bootbox.prompt({
+        message: "",
+        title: "Enter new name for the task:",
+        value: taskName,
+        animate: false,
+        callback: function (result) {
+            if (result) {
+                requestData("/api/Tracktor/UpdateTask", "POST", {
+                    TTaskID: taskId,
+                    Name: result
+                }, refreshModel);
+            }
+        }
+    });
 }

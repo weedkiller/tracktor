@@ -329,6 +329,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\tracktor.ts" />
+    <TypeScriptCompile Include="Scripts\typings\bootbox\bootbox.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts" />

@@ -121,7 +121,50 @@ namespace tracktor.service
         {
             try
             {
-                return UpdateObject<TTaskDto, TTask>(context, task, _db.TTasks, (t => t.TTaskID == task.TTaskID));
+                if (task.TTaskID > 0)
+                {
+                    var existingTask = _db.TTasks.SingleOrDefault(e => e.TTaskID == task.TTaskID);
+                    if (existingTask != null)
+                    {
+                        if (existingTask.TProject.TUserID == context.TUserID)
+                        {
+                            // if there are no entries, remove it instead
+                            if (task.IsObsolete && !_db.TEntries.Any(e => e.TTaskID == task.TTaskID))
+                            {
+                                _db.TTasks.Remove(existingTask);
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrWhiteSpace(task.Name))
+                                {
+                                    existingTask.Name = task.Name;
+                                }
+                                existingTask.IsObsolete = task.IsObsolete;
+                                existingTask.DisplayOrder = task.DisplayOrder;
+                            }
+                            _db.SaveChanges();
+                        }
+                        return Mapper.Map<TTaskDto>(existingTask);
+                    }
+                }
+                else if (task.TProjectID > 0 && !task.IsObsolete && !string.IsNullOrWhiteSpace(task.Name))
+                {
+                    var existingProject = _db.TProjects.SingleOrDefault(p => p.TProjectID == task.TProjectID && p.TUserID == context.TUserID);
+                    if (existingProject != null)
+                    {
+                        var newTask = new TTask
+                        {
+                            DisplayOrder = task.DisplayOrder,
+                            IsObsolete = task.IsObsolete,
+                            Name = task.Name,
+                            TProjectID = task.TProjectID
+                        };
+                        _db.TTasks.Add(newTask);
+                        _db.SaveChanges();
+                        return Mapper.Map<TTaskDto>(newTask);
+                    }
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -133,7 +176,46 @@ namespace tracktor.service
         {
             try
             {
-                return UpdateObject<TProjectDto, TProject>(context, project, _db.TProjects, (t => t.TProjectID == project.TProjectID));
+                if (project.TProjectID > 0)
+                {
+                    var existingProject = _db.TProjects.SingleOrDefault(e => e.TProjectID == project.TProjectID);
+                    if (existingProject != null)
+                    {
+                        if (existingProject.TUserID == context.TUserID)
+                        {
+                            // if there are no tasks, remove it instead
+                            if (project.IsObsolete && !_db.TTasks.Any(e => e.TProjectID == project.TProjectID))
+                            {
+                                _db.TProjects.Remove(existingProject);
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrWhiteSpace(project.Name))
+                                {
+                                    existingProject.Name = project.Name;
+                                }
+                                existingProject.IsObsolete = project.IsObsolete;
+                                existingProject.DisplayOrder = project.DisplayOrder;
+                            }
+                            _db.SaveChanges();
+                        }
+                        return Mapper.Map<TProjectDto>(existingProject);
+                    }
+                }
+                else if (!project.IsObsolete && !string.IsNullOrWhiteSpace(project.Name))
+                {
+                    var newProject = new TProject
+                    {
+                        DisplayOrder = project.DisplayOrder,
+                        IsObsolete = project.IsObsolete,
+                        Name = project.Name,
+                        TUserID = context.TUserID
+                    };
+                    _db.TProjects.Add(newProject);
+                    _db.SaveChanges();
+                    return Mapper.Map<TProjectDto>(newProject);
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -266,54 +348,6 @@ namespace tracktor.service
             catch (Exception ex)
             {
                 throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
-            }
-        }
-
-        #endregion
-
-        #region Helpers
-
-        protected D UpdateObject<D, T>(TContextDto context, D dto, DbSet<T> dbSet, Expression<Func<T, bool>> equality)
-            where D : new()
-            where T : class, new()
-        {
-            int dtoId = 0;
-            var storedObject = dbSet.Where(Expression.Lambda<Func<T, bool>>(equality, Expression.Parameter(typeof(T), "t"))).SingleOrDefault();
-            if (storedObject == null)
-            {
-                if (dtoId != 0)
-                {
-                    throw new Exception(String.Format("Unable to find existing {0} object with ID {1}!", typeof(T).Name, dtoId));
-                }
-                storedObject = new T();
-                dbSet.Add(storedObject);
-            }
-            else if (!IsAllowed(context, storedObject))
-            {
-                throw new Exception(String.Format("User ID {0} is not allowed to modify {1} object with ID {2}!", context.TUserID, typeof(T).Name, dtoId));
-            }
-            Mapper.Map<D, T>(dto, storedObject);
-            _db.SaveChanges();
-            return Mapper.Map<D>(storedObject);
-        }
-
-        protected bool IsAllowed(TContextDto context, object storedObject)
-        {
-            if (storedObject is TEntry)
-            {
-                return IsAllowed(context, (storedObject as TEntry).TTask);
-            }
-            else if (storedObject is TTask)
-            {
-                return IsAllowed(context, (storedObject as TTask).TProject);
-            }
-            else if (storedObject is TProject)
-            {
-                return context.TUserID == (storedObject as TProject).TUserID;
-            }
-            else
-            {
-                return true;
             }
         }
 

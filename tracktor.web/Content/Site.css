@@ -96,3 +96,14 @@ table.reporttable
 {
     padding-top: 10px;
 }
+
+.hidingbutton 
+{
+    visibility: hidden;
+    cursor: pointer;
+}
+
+tr:hover .hidingbutton 
+{
+    visibility: visible;
+}
