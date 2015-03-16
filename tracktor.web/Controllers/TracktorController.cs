@@ -24,22 +24,27 @@ namespace tracktor.web.Controllers
     {
         private ITracktorService _service = new TracktorService(); // load locally, but can replace with remote invocation
 
+        public static TContextDto GetContext(IOwinContext owinContext)
+        {
+            var userID = Int32.Parse(owinContext.Authentication.User.FindFirst("TUserID").Value);
+            var user = owinContext.GetUserManager<ApplicationUserManager>().Users.Where(u => u.TUserID == userID).FirstOrDefault();
+            var userTimeZone = TimeZoneInfo.Utc;
+            if (!string.IsNullOrWhiteSpace(user.TimeZone))
+            {
+                userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone);
+            }
+            return new TContextDto
+            {
+                TUserID = userID,
+                UTCOffset = -(int)userTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes
+            };
+        }
+
         private TContextDto Context
         {
             get
             {
-                var userID = Int32.Parse(this.Request.GetOwinContext().Authentication.User.FindFirst("TUserID").Value);
-                var user = Request.GetOwinContext().GetUserManager<ApplicationUserManager>().Users.Where(u => u.TUserID == userID).FirstOrDefault();
-                var userTimeZone = TimeZoneInfo.Utc;
-                if (!string.IsNullOrWhiteSpace(user.TimeZone))
-                {
-                    userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone);
-                }
-                return new TContextDto
-                {
-                    TUserID = userID,
-                    UTCOffset = -(int)userTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes
-                };
+                return GetContext(Request.GetOwinContext());
             }
         }
 
@@ -146,7 +151,7 @@ namespace tracktor.web.Controllers
                 }
                 var currentDay = new WebReportDay(rollingDate, contrib, month);
                 currentWeek.Days.Add(currentDay);
-                if(currentDay.InFocus)
+                if (currentDay.InFocus)
                 {
                     currentWeek.Contrib += contrib;
                     webReport.Contrib += contrib;

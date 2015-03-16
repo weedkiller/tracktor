@@ -325,3 +325,7 @@ var generateReport = function () {
             $(".reportcurtain").show();
     });
 }
+
+var downloadCSV = function () {
+    window.location.assign(_urlRoot + "/Home/CSV");
+}

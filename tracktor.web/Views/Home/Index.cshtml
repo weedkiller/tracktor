@@ -48,6 +48,7 @@
             <li role="presentation" class="active"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;&nbsp;Summary</a></li>
             <li role="presentation"><a href="#log" aria-controls="report" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list" aria-hidden="true"></span>&nbsp;&nbsp;Log</a></li>
             <li role="presentation"><a href="#report" aria-controls="report" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>&nbsp;&nbsp;Report</a></li>
+            <li role="presentation"><a href="#export" aria-controls="export" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-save" aria-hidden="true"></span>&nbsp;&nbsp;Export</a></li>
         </ul>
 
         <div class="tab-content">
@@ -245,52 +246,57 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="entryEditModal" tabindex="-1" role="dialog" aria-labelledby="entryEditModalLabel" aria-hidden="true">
-    <div class="modal-dialog" id="EditModel">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="entryEditModalLabel">Edit Entry</h4>
-            </div>
-            <div class="modal-body">
-                <form id="entryEditForm">
-                    <p>
-                        Project: <span data-bind="text: Entry.ProjectName" />
-                    </p>
-                    <p>
-                        Task: <span data-bind="text: Entry.TaskName" />
-                    </p>
-                    <p>
-                        Start: <input type="text" data-bind="value: Entry.StartDate" name="StartDate" />
-                    </p>
-                    <p>
-                        End: <input type="text" data-bind="value: Entry.EndDate" name="EndDate" />
-                    </p>
-                    <p>
-                        Contrib: <span data-bind="text: timeSpanFull(Entry.Contrib())" />
-                    </p>
-                    <input type="hidden" data-bind="value: Entry.TEntryID" name="TEntryID" />
-                    <input type="hidden" data-bind="value: Entry.TTaskID" name="TTaskID" />
-                    <input type="hidden" id="IsDeleted" name="IsDeleted" value="false" />
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-xs btn-danger summarybutton" data-bind="click: deleteEntry.bind($data, null)" data-dismiss="modal">Delete</button>
-                <button type="button" class="btn btn-xs btn-success summarybutton" data-bind="click: saveEntry.bind($data, null)">Save</button>
-                <button type="button" class="btn btn-xs btn-primary summarybutton" data-bind="click: refreshModel.bind($data, null)" data-dismiss="modal">Close</button>
+            <div role="tabpanel" class="tab-pane" id="export">
+                <div class="tabcontent">
+                    <button class="btn btn-sm btn-primary" onclick="downloadCSV();">
+                        Download .csv
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-@section scripts {
-    @Scripts.Render("~/bundles/tracktor")
+        <div class="modal" id="entryEditModal" tabindex="-1" role="dialog" aria-labelledby="entryEditModalLabel" aria-hidden="true">
+            <div class="modal-dialog" id="EditModel">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="entryEditModalLabel">Edit Entry</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="entryEditForm">
+                            <p>
+                                Project: <span data-bind="text: Entry.ProjectName" />
+                            </p>
+                            <p>
+                                Task: <span data-bind="text: Entry.TaskName" />
+                            </p>
+                            <p>
+                                Start: <input type="text" data-bind="value: Entry.StartDate" name="StartDate" />
+                            </p>
+                            <p>
+                                End: <input type="text" data-bind="value: Entry.EndDate" name="EndDate" />
+                            </p>
+                            <p>
+                                Contrib: <span data-bind="text: timeSpanFull(Entry.Contrib())" />
+                            </p>
+                            <input type="hidden" data-bind="value: Entry.TEntryID" name="TEntryID" />
+                            <input type="hidden" data-bind="value: Entry.TTaskID" name="TTaskID" />
+                            <input type="hidden" id="IsDeleted" name="IsDeleted" value="false" />
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-xs btn-danger summarybutton" data-bind="click: deleteEntry.bind($data, null)" data-dismiss="modal">Delete</button>
+                        <button type="button" class="btn btn-xs btn-success summarybutton" data-bind="click: saveEntry.bind($data, null)">Save</button>
+                        <button type="button" class="btn btn-xs btn-primary summarybutton" data-bind="click: refreshModel.bind($data, null)" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <script type="text/javascript">
-        initializeModel("");
-    </script>
-}
+        @section scripts {
+            @Scripts.Render("~/bundles/tracktor")
+
+            <script type="text/javascript">
+                initializeModel("");
+            </script>
+        }
