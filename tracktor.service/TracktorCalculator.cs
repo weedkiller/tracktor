@@ -46,7 +46,7 @@ namespace tracktor.service
             if (inputDate.HasValue)
             {
                 Debug.Assert(inputDate.Value.Kind != DateTimeKind.Local, "Input Date is already local!");
-                return new DateTime(inputDate.Value.Ticks, DateTimeKind.Local).AddMinutes(-mContext.UTCOffset);
+                return new DateTime(inputDate.Value.Ticks, DateTimeKind.Unspecified).AddMinutes(-mContext.UTCOffset);
             }
             return null;
         }

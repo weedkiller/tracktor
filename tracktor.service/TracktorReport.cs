@@ -27,7 +27,7 @@ namespace tracktor.service
 
         public void AddContrib(DateTime day, int taskId, double amount)
         {
-            Debug.Assert(day.Kind == DateTimeKind.Local, "Day is not in local time!");
+            //Debug.Assert(day.Kind == DateTimeKind.Local, "Day is not in local time!");
             if(day < StartDate || day > EndDate)
             {
                 return; // ignore

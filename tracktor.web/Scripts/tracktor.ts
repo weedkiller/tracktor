@@ -17,10 +17,10 @@ var dateTime = function (s: string) {
     }
     var date = new Date(s);
     var dateString =
-        padNumber(date.getDate()) + "/" +
-        padNumber(date.getMonth() + 1) + " " +
-        padNumber(date.getHours()) + ":" +
-        padNumber(date.getMinutes());
+        padNumber(date.getUTCDate()) + "/" +
+        padNumber(date.getUTCMonth() + 1) + " " +
+        padNumber(date.getUTCHours()) + ":" +
+        padNumber(date.getUTCMinutes());
     return dateString;
 }
 
@@ -201,13 +201,12 @@ var updateHomeModel = function (data) {
         ko.mapping.fromJS(data.ReportModel, {}, reportModel);
     }
     if (data.EditModel) {
+        $("#EditEndDate").data("DateTimePicker").date(null);
         ko.mapping.fromJS(data.EditModel, {}, editModel);
         // update datepickers
         $("#EditStartDate").data("DateTimePicker").date(moment(editModel.Entry.StartDate()));
-        if (data.EditModel.Entry.EndDate != null) {
+        if (editModel.Entry.EndDate() != null) {
             $("#EditEndDate").data("DateTimePicker").date(moment(editModel.Entry.EndDate()));
-        } else {
-            $("#EditEndDate").data("DateTimePicker").date(null);
         }
     }
 };
@@ -366,7 +365,7 @@ var newTask = function (projectId: number) {
         animate: false,
         callback: function (result) {
             if (result) {
-                requestData("/api/Tracktor/UpdateTask", "POST", {
+                requestData("api/Tracktor/UpdateTask", "POST", {
                     TProjectID: projectId,
                     TTaskID: 0,
                     Name: result
@@ -383,7 +382,7 @@ var obsoleteTask = function (taskId: number, taskName: string) {
         animate: false,
         callback: function (result) {
             if (result) {
-                requestData("/api/Tracktor/UpdateTask", "POST", {
+                requestData("api/Tracktor/UpdateTask", "POST", {
                     TTaskID: taskId,
                     IsObsolete: true
                 }, refreshModel);
@@ -399,7 +398,7 @@ var newProject = function () {
         animate: false,
         callback: function (result) {
             if (result) {
-                requestData("/api/Tracktor/UpdateProject", "POST", {
+                requestData("api/Tracktor/UpdateProject", "POST", {
                     Name: result
                 }, refreshModel);
             }
@@ -414,7 +413,7 @@ var obsoleteProject = function (projectId: number, projectName: string) {
             animate: false,
             callback: function (result) {
                 if (result) {
-                    requestData("/api/Tracktor/UpdateProject", "POST", {
+                    requestData("api/Tracktor/UpdateProject", "POST", {
                         TProjectID: projectId,
                         IsObsolete: true
                     }, refreshModel);
@@ -431,7 +430,7 @@ var renameProject = function (projectId: number, projectName: string) {
         animate: false,
         callback: function (result) {
             if (result) {
-                requestData("/api/Tracktor/UpdateProject", "POST", {
+                requestData("api/Tracktor/UpdateProject", "POST", {
                     TProjectID: projectId,
                     Name: result
                 }, refreshModel);
@@ -448,7 +447,7 @@ var renameTask = function (taskId: number, taskName: string) {
         animate: false,
         callback: function (result) {
             if (result) {
-                requestData("/api/Tracktor/UpdateTask", "POST", {
+                requestData("api/Tracktor/UpdateTask", "POST", {
                     TTaskID: taskId,
                     Name: result
                 }, refreshModel);

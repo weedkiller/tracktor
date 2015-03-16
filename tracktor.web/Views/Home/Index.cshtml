@@ -342,7 +342,7 @@
     @Scripts.Render("~/bundles/tracktor")
 
     <script type="text/javascript">
-        initializeModel("");
+        initializeModel("@Url.Content("~")");
 
         $("#EditStartDate").datetimepicker({
             format: 'DD/MM/YYYY HH:mm:ss',
@@ -365,6 +365,9 @@
         $("#EditEndDate").on("dp.change", function (e) {
             if (e.date != null) {
                 $('#EditStartDate').data("DateTimePicker").maxDate(e.date);
+            }
+            else {
+                $('#EditStartDate').data("DateTimePicker").maxDate();
             }
             editModel.Entry.EndDate(moment(e.date).toISOString());
             updateEditContrib();

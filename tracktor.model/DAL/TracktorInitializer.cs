@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tracktor.model.DAL
 {
-    public class TracktorInitializer : System.Data.Entity.DropCreateDatabaseIfModelChanges<TracktorContext>
+    public class TracktorInitializer : System.Data.Entity.CreateDatabaseIfNotExists<TracktorContext>
     {
         protected override void Seed(TracktorContext context)
         {
