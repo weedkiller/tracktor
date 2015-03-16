@@ -213,6 +213,7 @@ var _urlRoot = "";
 
 var initializeModel = function (urlRoot: string) {
     _urlRoot = urlRoot;
+    $(".reportcurtain").hide();
     requestData("api/Tracktor/GetModel", "GET", {}, bindHomeModel);
 };
 
@@ -309,4 +310,18 @@ var disableButtons = function () {
 
 var enableButtons = function () {
     $("button").prop("disabled", false);
+}
+
+var generateReport = function () {
+    var data = {
+        year: $('#ReportYear').val(),
+        month: $('#ReportMonth').val(),
+        projectID: $('#ReportProject').val()
+    };
+    $(".reportcurtain").hide();
+    requestData("api/Tracktor/GetWebReport", "GET", data,
+        function (data) {
+            updateHomeModel(data);
+            $(".reportcurtain").show();
+    });
 }

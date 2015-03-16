@@ -151,22 +151,98 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="report">
-                <div class="tabcontent">
-                    <table class="table table-bordered" style="width: 80%; margin: 0 auto;" id="ReportModel">
-                        <thead>
-                            <tr>
-                                <th style="text-align: center; width: 90px;">Mon</th>
-                                <th style="text-align: center; width: 90px;">Tue</th>
-                                <th style="text-align: center; width: 90px;">Wed</th>
-                                <th style="text-align: center; width: 90px;">Thu</th>
-                                <th style="text-align: center; width: 90px;">Fri</th>
-                                <th style="text-align: center; width: 90px; color: red;">Sat</th>
-                                <th style="text-align: center; width: 90px; color: red;">Sun</th>
-                                <th style="text-align: center; width: 90px;">TOTAL</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                <div class="tabcontent" id="ReportModel">
+                    <form class="form-inline row">
+                        <div class=" center-block">
+                            <div class="col-xs-2 col-xs-offset-2">
+                                <label for="ReportYear">Year</label>
+                                <select id="ReportYear" data-bind="options: Years, value: SelectedYear" class="form-control input-sm"></select>
+                            </div>
+                            <div class="col-xs-2">
+                                <label for="ReportYear">Month</label>
+                                <select id="ReportMonth" data-bind="options: Months, value: SelectedMonth" class="form-control input-sm"></select>
+                            </div>
+                            <div class="col-xs-3">
+                                <label for="ReportYear">Project</label>
+                                <select id="ReportProject" data-bind="options: Projects, optionsValue: 'Key', optionsText: 'Value'" class="form-control input-sm"></select>
+                            </div>
+                            <div class="col-xs-2">
+                                <button class="btn btn-sm btn-primary" data-bind="click: generateReport.bind($data)" type="button">
+                                    <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>&nbsp;&nbsp;Generate&nbsp;&nbsp;
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <hr />
+                    <div class="reportcurtain">
+                        <h4 class="reportsub">Monthly Report</h4>
+                        <table class="table table-bordered reporttable">
+                            <thead>
+                                <tr>
+                                    <th class="reporthead">Mon</th>
+                                    <th class="reporthead">Tue</th>
+                                    <th class="reporthead">Wed</th>
+                                    <th class="reporthead">Thu</th>
+                                    <th class="reporthead">Fri</th>
+                                    <th class="reporthead weekend">Sat</th>
+                                    <th class="reporthead weekend">Sun</th>
+                                    <th class="reporthead">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- ko foreach: Report -->
+                                <tr>
+                                    <!-- ko foreach: Days -->
+                                    <td class="reportcell" data-bind="css: { outoffocus: !InFocus() }">
+                                        <span data-bind="text: Day()"></span><br />
+                                        <span class="reportcontrib" data-bind="text: timeSpan(Contrib()), visible: Contrib() != 0"></span>
+                                    </td>
+                                    <!-- /ko -->
+                                    <td class="reportcell">
+                                        <span>&nbsp;</span><br />
+                                        <span data-bind="text: timeSpan(Contrib())"></span>
+                                    </td>
+                                </tr>
+                                <!-- /ko -->
+                                <tr>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">&nbsp;</th>
+                                    <th class="reporttotal">
+                                        <span>&nbsp;</span><br />
+                                        <span data-bind="text: timeSpan(Contrib())"></span>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h4 class="reportsub">Task Breakdown</h4>
+                        <table class="table table-condensed table-hover reporttable">
+                            <thead>
+                                <tr class="emphasis">
+                                    <th class="center" style="width: 100px;">Project</th>
+                                    <th class="center" style="width: 350px;">Task</th>
+                                    <th class="center" style="width: 100px;">Contrib</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: ProjectContribs">
+                                <tr class="active">
+                                    <td data-bind="text: ProjectName" colspan="2"></td>
+                                    <td class="contrib"><span data-bind="text: timeSpan(Contrib())"></span></td>
+                                </tr>
+                                <!-- ko foreach: TaskContribs -->
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td data-bind="text: TaskName"></td>
+                                    <td class="contrib"><span data-bind="text: timeSpan(Contrib())"></span></td>
+                                </tr>
+                                <!-- /ko -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

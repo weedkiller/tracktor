@@ -49,3 +49,50 @@ div.curtain {
     border-radius: 4px;
     box-shadow: none;
 }
+
+th.reporthead
+{
+    text-align: center;
+    width: 90px;
+}
+
+th.reporttotal
+{
+    text-align: right;
+    width: 90px;
+    font-weight: bold;
+}
+
+th.weekend
+{
+    color:red;
+}
+
+td.reportcell
+{
+    text-align: right;
+}
+
+td.outoffocus {
+    color: #ccc;
+}
+
+span.reportcontrib {
+    color: #999;
+}
+
+table.reporttable
+{
+    width: 90%;
+    margin: 0 auto;
+}
+
+.reportcurtain {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.reportsub
+{
+    padding-top: 10px;
+}

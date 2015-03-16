@@ -46,9 +46,10 @@ namespace tracktor.web.Controllers
         [HttpGet]
         public TracktorWebModel GetModel(bool updateOnly = false)
         {
+            var summaryModel = _service.GetSummaryModel(Context);
             return new TracktorWebModel
             {
-                SummaryModel = _service.GetSummaryModel(Context),
+                SummaryModel = summaryModel,
                 EntriesModel = _service.GetEntriesModel(Context, null, null, 0, 0, 20),
                 StatusModel = _service.GetStatusModel(Context),
                 EditModel = updateOnly ? null : new TEditModelDto
@@ -66,13 +67,7 @@ namespace tracktor.web.Controllers
                         Contrib = 0,
                     }
                 },
-                ReportModel = updateOnly ? null : new TReportModelDto
-                {
-                    StartDate = DateTime.UtcNow,
-                    EndDate = DateTime.UtcNow,
-                    DayContribs = new Dictionary<DateTime, double> { { DateTime.UtcNow.Date, 0 } },
-                    TaskContribs = new Dictionary<int, double> { { 0, 0 } }
-                }
+                ReportModel = updateOnly ? null : WebReportModel.Create(summaryModel, DateTime.UtcNow)
             };
         }
 
@@ -122,11 +117,76 @@ namespace tracktor.web.Controllers
         }
 
         [HttpGet]
-        public TracktorWebModel GetReportModel(DateTime? startDate, DateTime? endDate, int projectID)
+        public TracktorWebModel GetWebReport(int year, int month, int projectID)
         {
+            var summaryModel = _service.GetSummaryModel(Context);
+            var startDate = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Local);
+            var endDate = startDate.AddMonths(1);
+            var reportModel = _service.GetReportModel(Context, startDate, endDate, projectID);
+            var webReport = WebReportModel.Create(summaryModel, startDate);
+
+            var reportStart = startDate.StartOfWeek(DayOfWeek.Monday);
+            var reportEnd = endDate.StartOfWeek(DayOfWeek.Monday).AddDays(6);
+            var rollingDate = reportStart;
+            WebReportWeek currentWeek = null;
+            while (rollingDate <= reportEnd)
+            {
+                if (rollingDate.DayOfWeek == DayOfWeek.Monday)
+                {
+                    if (currentWeek != null)
+                    {
+                        webReport.Report.Add(currentWeek);
+                    }
+                    currentWeek = new WebReportWeek(rollingDate);
+                }
+                double contrib = 0;
+                if (reportModel.DayContribs.ContainsKey(rollingDate))
+                {
+                    contrib = reportModel.DayContribs[rollingDate];
+                }
+                var currentDay = new WebReportDay(rollingDate, contrib, month);
+                currentWeek.Days.Add(currentDay);
+                if(currentDay.InFocus)
+                {
+                    currentWeek.Contrib += contrib;
+                    webReport.Contrib += contrib;
+                }
+
+                rollingDate = rollingDate.AddDays(1);
+            }
+            if (currentWeek != null)
+            {
+                webReport.Report.Add(currentWeek);
+            }
+
+            foreach (var project in summaryModel.Projects.Where(p => projectID == 0 || p.TProjectID == projectID))
+            {
+                var projectContrib = new WebReportProjectContrib
+                {
+                    ProjectName = project.Name,
+                    TaskContribs = new List<WebReportTaskContrib>(),
+                    Contrib = 0
+                };
+                foreach (var task in project.TTasks)
+                {
+                    var taskContrib = new WebReportTaskContrib
+                    {
+                        TaskName = task.Name,
+                        Contrib = 0
+                    };
+                    if (reportModel.TaskContribs.ContainsKey(task.TTaskID))
+                    {
+                        taskContrib.Contrib = reportModel.TaskContribs[task.TTaskID];
+                    }
+                    projectContrib.TaskContribs.Add(taskContrib);
+                    projectContrib.Contrib += taskContrib.Contrib;
+                }
+                webReport.ProjectContribs.Add(projectContrib);
+            }
+
             return new TracktorWebModel
             {
-                ReportModel = _service.GetReportModel(Context, startDate, endDate, projectID)
+                ReportModel = webReport
             };
         }
 

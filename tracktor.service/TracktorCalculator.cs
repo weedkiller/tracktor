@@ -97,7 +97,7 @@ namespace tracktor.service
             Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
 
             List<TEntry> entries = GetEntries(startDate, endDate, projectID);
-            var report = new TracktorReport(startDate, endDate);
+            var report = new TracktorReport(startDate, endDate.AddDays(-1));
             foreach (var entry in entries)
             {
                 BucketEntry(entry, report);

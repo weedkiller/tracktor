@@ -131,9 +131,5 @@ namespace tracktor.service
         public Dictionary<DateTime, double> DayContribs { get; set; }
         [DataMember]
         public Dictionary<int, double> TaskContribs { get; set; }
-        [DataMember]
-        public DateTime? StartDate { get; set; }
-        [DataMember]
-        public DateTime EndDate { get; set; }
     }
 }

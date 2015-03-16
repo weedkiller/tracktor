@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -25,6 +26,16 @@ namespace tracktor.service
         {
             try
             {
+                // use database seeded projects for guest
+                var guestEmail = ConfigurationManager.AppSettings["GuestEmail"];
+                if (!string.IsNullOrWhiteSpace(guestEmail) && userName.Equals(guestEmail, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var firstUser = _db.TUsers.OrderBy(u => u.TUserID).FirstOrDefault();
+                    if (firstUser != null)
+                    {
+                        return firstUser.TUserID;
+                    }
+                }
                 var newUser = new TUser { Name = userName, LastTaskID = 0, CurrentState = TState.Idle };
                 _db.TUsers.Add(newUser);
                 _db.SaveChanges();
