@@ -112,3 +112,7 @@ tr:hover .hidingbutton
 .modal-open[style] {
     padding-right: 0 !important;
 }
+
+a:focus {
+    outline: 0 !important;
+}
