@@ -4,6 +4,7 @@
 body {
     padding-top: 0;
     padding-bottom: 20px;
+    width: 100%;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -106,4 +107,8 @@ table.reporttable
 tr:hover .hidingbutton 
 {
     visibility: visible;
+}
+
+.modal-open[style] {
+    padding-right: 0 !important;
 }
