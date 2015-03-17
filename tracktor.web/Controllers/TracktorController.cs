@@ -22,7 +22,12 @@ namespace tracktor.web.Controllers
     [Authorize]
     public class TracktorController : ApiController
     {
-        private ITracktorService _service = new TracktorService(); // TODO: use MEF
+        private ITracktorService _service;
+
+        public TracktorController(ITracktorService service)
+        {
+            _service = service;
+        }
 
         public static TContextDto GetContext(IOwinContext owinContext)
         {
@@ -214,19 +219,6 @@ namespace tracktor.web.Controllers
         {
             _service.SwitchTask(Context, actionModel.currentTaskID, actionModel.newTaskID);
             return GetModel(true);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_service != null && _service is IDisposable)
-                {
-                    (_service as IDisposable).Dispose();
-                    _service = null;
-                }
-            }
-            base.Dispose(disposing);
         }
     }
 }

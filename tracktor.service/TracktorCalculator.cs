@@ -10,15 +10,16 @@ using tracktor.model.DAL;
 
 namespace tracktor.service
 {
-    public class TracktorCalculator : IDisposable
+    public class TracktorCalculator
     {
         private readonly static int MaxEntries = 99999;
+        private ITracktorContext _db;
 
-        private TracktorContext _db = new TracktorContext(); // TODO: use MEF
         protected TContextDto mContext;
 
-        public TracktorCalculator(TContextDto context)
+        public TracktorCalculator(TContextDto context, ITracktorContext db)
         {
+            _db = db;
             mContext = context;
         }
 
@@ -228,27 +229,5 @@ namespace tracktor.service
 
             return dtos;
         }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_db != null)
-                {
-                    _db.Dispose();
-                    _db = null;
-                }
-            }
-        }
-
-        #endregion
     }
 }

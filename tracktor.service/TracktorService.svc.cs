@@ -16,9 +16,14 @@ using tracktor.model.DAL;
 namespace tracktor.service
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class TracktorService : ITracktorService, IDisposable
+    public class TracktorService : ITracktorService
     {
-        private TracktorContext _db = new TracktorContext(); // TODO: use MEF
+        private ITracktorContext _db;
+
+        public TracktorService(ITracktorContext db)
+        {
+            _db = db;
+        }
 
         #region ITracktorService
 
@@ -72,10 +77,8 @@ namespace tracktor.service
         {
             try
             {
-                using (var calc = new TracktorCalculator(context))
-                {
-                    return calc.BuildSummaryModel(null, calc.DateOrLocalNow(null));
-                }
+                var calc = new TracktorCalculator(context, _db);
+                return calc.BuildSummaryModel(null, calc.DateOrLocalNow(null));
             }
             catch (Exception ex)
             {
@@ -87,10 +90,8 @@ namespace tracktor.service
         {
             try
             {
-                using (var calc = new TracktorCalculator(context))
-                {
-                    return calc.BuildStatusModel();
-                }
+                var calc = new TracktorCalculator(context, _db);
+                return calc.BuildStatusModel();
             }
             catch (Exception ex)
             {
@@ -102,14 +103,12 @@ namespace tracktor.service
         {
             try
             {
-                using (var calc = new TracktorCalculator(context))
+                var calc = new TracktorCalculator(context, _db);
+                var entries = calc.GetEntries(startDate, calc.DateOrLocalNow(endDate), projectID, startNo, maxEntries);
+                return new TEntriesModelDto
                 {
-                    var entries = calc.GetEntries(startDate, calc.DateOrLocalNow(endDate), projectID, startNo, maxEntries);
-                    return new TEntriesModelDto
-                    {
-                        Entries = calc.CalculateEntryContribs(entries, startDate, calc.DateOrLocalNow(endDate))
-                    };
-                }
+                    Entries = calc.CalculateEntryContribs(entries, startDate, calc.DateOrLocalNow(endDate))
+                };
             }
             catch (Exception ex)
             {
@@ -227,11 +226,9 @@ namespace tracktor.service
         {
             try
             {
-                using (var calc = new TracktorCalculator(context))
-                {
-                    var entry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entryID && e.TTask.TProject.TUserID == context.TUserID);
-                    return calc.EnrichTEntry(null, entry);
-                }
+                var calc = new TracktorCalculator(context, _db);
+                var entry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entryID && e.TTask.TProject.TUserID == context.TUserID);
+                return calc.EnrichTEntry(null, entry);
             }
             catch (Exception ex)
             {
@@ -248,38 +245,36 @@ namespace tracktor.service
                     var existingEntry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entry.TEntryID);
                     if (existingEntry != null)
                     {
-                        using (var calculator = new TracktorCalculator(context))
+                        var calculator = new TracktorCalculator(context, _db);
+                        if (existingEntry.TTask.TProject.TUserID == context.TUserID)
                         {
-                            if (existingEntry.TTask.TProject.TUserID == context.TUserID)
+                            if (entry.IsDeleted == true)
                             {
-                                if (entry.IsDeleted == true)
+                                // stop if in progress
+                                if (!existingEntry.EndDate.HasValue)
                                 {
-                                    // stop if in progress
-                                    if (!existingEntry.EndDate.HasValue)
-                                    {
-                                        StopTask(context, entry.TTaskID);
-                                        existingEntry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entry.TEntryID);
-                                    }
-                                    _db.TEntries.Remove(existingEntry);
-                                    _db.SaveChanges();
-                                    return null;
+                                    StopTask(context, entry.TTaskID);
+                                    existingEntry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entry.TEntryID);
                                 }
-                                else
+                                _db.TEntries.Remove(existingEntry);
+                                _db.SaveChanges();
+                                return null;
+                            }
+                            else
+                            {
+                                var startUtc = calculator.ToUtc(entry.StartDate).Value;
+                                var endUtc = calculator.ToUtc(entry.EndDate);
+                                var now = DateTime.UtcNow;
+                                if (startUtc <= now &&
+                                    (!endUtc.HasValue || (endUtc.HasValue && endUtc.Value <= now && endUtc.Value > startUtc)))
                                 {
-                                    var startUtc = calculator.ToUtc(entry.StartDate).Value;
-                                    var endUtc = calculator.ToUtc(entry.EndDate);
-                                    var now = DateTime.UtcNow;
-                                    if (startUtc <= now &&
-                                        (!endUtc.HasValue || (endUtc.HasValue && endUtc.Value <= now && endUtc.Value > startUtc)))
-                                    {
-                                        existingEntry.StartDate = startUtc;
-                                        existingEntry.EndDate = endUtc;
-                                        _db.SaveChanges();
-                                    }
+                                    existingEntry.StartDate = startUtc;
+                                    existingEntry.EndDate = endUtc;
+                                    _db.SaveChanges();
                                 }
                             }
-                            return calculator.EnrichTEntry(null, existingEntry);
                         }
+                        return calculator.EnrichTEntry(null, existingEntry);
                     }
                 }
                 return null;
@@ -294,10 +289,8 @@ namespace tracktor.service
         {
             try
             {
-                using (var calculator = new TracktorCalculator(context))
-                {
-                    return Mapper.Map<TReportModelDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID));
-                }
+                var calculator = new TracktorCalculator(context, _db);
+                return Mapper.Map<TReportModelDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID));
             }
             catch (Exception ex)
             {
@@ -309,10 +302,8 @@ namespace tracktor.service
         {
             try
             {
-                using (var states = new TracktorStates(context))
-                {
-                    states.Stop(currentTaskID);
-                }
+                var states = new TracktorStates(context, _db);
+                states.Stop(currentTaskID);
             }
             catch (Exception ex)
             {
@@ -324,10 +315,8 @@ namespace tracktor.service
         {
             try
             {
-                using (var states = new TracktorStates(context))
-                {
-                    states.Start(newTaskID);
-                }
+                var states = new TracktorStates(context, _db);
+                states.Start(newTaskID);
             }
             catch (Exception ex)
             {
@@ -339,37 +328,13 @@ namespace tracktor.service
         {
             try
             {
-                using (var states = new TracktorStates(context))
-                {
-                    states.Stop(currentTaskID);
-                    states.Start(newTaskID);
-                }
+                var states = new TracktorStates(context, _db);
+                states.Stop(currentTaskID);
+                states.Start(newTaskID);
             }
             catch (Exception ex)
             {
                 throw new WebFaultException<string>(ex.Message, HttpStatusCode.BadRequest);
-            }
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_db != null)
-                {
-                    _db.Dispose();
-                    _db = null;
-                }
             }
         }
 

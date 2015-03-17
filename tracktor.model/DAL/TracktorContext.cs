@@ -55,11 +55,20 @@ namespace tracktor.model.DAL
         public virtual TTask TTask { get; set; }
     }
 
-    public class TracktorContext : DbContext
+    public interface ITracktorContext : IDisposable
+    {
+        DbSet<TUser> TUsers { get; set; }
+        DbSet<TProject> TProjects { get; set; }
+        DbSet<TTask> TTasks { get; set; }
+        DbSet<TEntry> TEntries { get; set; }
+
+        int SaveChanges();
+    }
+
+    public class TracktorContext : DbContext, ITracktorContext
     {
         public TracktorContext() : base("DefaultConnection")
         {
-
         }
 
         public DbSet<TUser> TUsers { get; set; }
@@ -70,6 +79,11 @@ namespace tracktor.model.DAL
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
         }
     }
 }

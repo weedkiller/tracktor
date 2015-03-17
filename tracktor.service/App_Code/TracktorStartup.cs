@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Autofac;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,11 @@ namespace tracktor.service
             });
 
             Mapper.CreateMap<TracktorReport, TReportModelDto>();
+        }
+
+        public static void ConfigureAutofac(ContainerBuilder builder)
+        {
+            builder.RegisterType<TracktorContext>().As<ITracktorContext>();
         }
     }
 }

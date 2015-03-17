@@ -10,7 +10,12 @@ namespace tracktor.web.Controllers
 {
     public class HomeController : Controller
     {
-        private ITracktorService _service = new TracktorService(); // TODO: use MEF
+        private ITracktorService _service;
+
+        public HomeController(ITracktorService service)
+        {
+            _service = service;
+        }
 
         [Authorize]
         public ActionResult Index()
@@ -52,19 +57,6 @@ namespace tracktor.web.Controllers
                 System.Text.Encoding.UTF8.GetBytes(csvFile.ToString()),
                 "text/csv",
                 string.Format("tracktor tasks {0}.csv", DateTime.UtcNow.ToString("yyyy-MM-dd")));
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_service != null && _service is IDisposable)
-                {
-                    (_service as IDisposable).Dispose();
-                    _service = null;
-                }
-            }
-            base.Dispose(disposing);
         }
     }
 }

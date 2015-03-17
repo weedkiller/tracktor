@@ -27,9 +27,11 @@ namespace tracktor.web.Controllers
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
+        private ITracktorService _service;
 
-        public AccountController()
+        public AccountController(ITracktorService service)
         {
+            _service = service;
         }
 
         public AccountController(ApplicationUserManager userManager,
@@ -338,8 +340,7 @@ namespace tracktor.web.Controllers
             {
                 try
                 {
-                    var service = new TracktorService(); // TODO: use MEF
-                    int userId = service.CreateUser(model.Email);
+                    int userId = _service.CreateUser(model.Email);
                     user.TUserID = userId;
                     result = await UserManager.UpdateAsync(user);
                     if (!result.Succeeded)

@@ -9,17 +9,18 @@ using tracktor.model.DAL;
 
 namespace tracktor.service
 {
-    class TracktorStates : IDisposable
+    class TracktorStates
     {
         protected TContextDto mContext;
         protected StateMachine<TState, TTrigger> mStateMachine;
 
-        private TracktorContext _db = new TracktorContext(); // TODO: use MEF
+        private ITracktorContext _db;
         private StateMachine<TState, TTrigger>.TriggerWithParameters<int> _startTrigger;
         private StateMachine<TState, TTrigger>.TriggerWithParameters<int> _stopTrigger;
 
-        public TracktorStates(TContextDto context)
+        public TracktorStates(TContextDto context, ITracktorContext db)
         {
+            _db = db;
             mContext = context;
             mStateMachine = new StateMachine<TState, TTrigger>(GetCurrentState, ChangeState);
             _startTrigger = mStateMachine.SetTriggerParameters<int>(TTrigger.Start);
@@ -130,27 +131,5 @@ namespace tracktor.service
                 throw new Exception(String.Format("Error stopping task {0} for user {1}: {2}", currentTaskId, mContext.TUserID, ex.Message));
             }
         }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_db != null)
-                {
-                    _db.Dispose();
-                    _db = null;
-                }
-            }
-        }
-
-        #endregion
     }
 }
