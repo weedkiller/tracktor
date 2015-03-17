@@ -316,7 +316,7 @@ var signOut = function () {
         var tokenKey = "TokenKey";
         var token = sessionStorage.removeItem(tokenKey);
 
-        window.location.assign("/");
+        window.location.assign(_urlRoot);
     });
 }
 
