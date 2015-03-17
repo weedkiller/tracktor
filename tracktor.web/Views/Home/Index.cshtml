@@ -57,13 +57,13 @@
                     <table class="table table-condensed table-hover" id="SummaryModel">
                         <thead>
                             <tr class="emphasis">
-                                <th class="center" style="width: 100px;">
-                                    Project
-                                    <span>&nbsp;</span>
-                                    <span class="glyphicon glyphicon-plus-sign hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: newProject.bind($data)"
-                                           title="Create Project"></span>
+                                <th class="center" style="width: 400px;">
+                                    Project / Task
                                 </th>
-                                <th class="center" style="width: 350px;">Task</th>
+                                <th class="left" style="width: 75px;">
+                                    <span class="glyphicon glyphicon-plus-sign hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: newProject.bind($data)"
+                                          title="Create Project"></span>
+                                </th>
                                 <th class="center" style="width: 100px;">Status</th>
                                 <th class="center" style="width: 100px;">Today</th>
                                 <th class="center" style="width: 100px;">Week</th>
@@ -74,9 +74,10 @@
                         <tbody>
                             <!-- ko foreach: Projects -->
                             <tr class="active" data-bind="visible: (!IsObsolete() || Contrib.ThisMonth() > 0)">
-                                <td colspan="2">
+                                <td>
                                     <span data-bind="text: Name"></span>
-                                    <span>&nbsp;</span>
+                                </td>
+                                <td class="left">
                                     <span class="glyphicon glyphicon-pencil hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: renameProject.bind($data, TProjectID(), Name())" title="Rename Project"></span>
                                     <span class="glyphicon glyphicon-remove-circle hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: obsoleteProject.bind($data, TProjectID(), Name())" title="Delete Project"></span>
                                     <span class="glyphicon glyphicon-plus-sign hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: newTask.bind($data, TProjectID())" title="Create Task"></span>
@@ -89,10 +90,11 @@
                             </tr>
                             <!-- ko foreach: TTasks -->
                             <tr data-bind="css: { success: InProgress }, visible: ((!$parent.IsObsolete() && !IsObsolete()) || Contrib.ThisMonth() > 0)">
-                                <td>&nbsp;</td>
-                                <td>
+                                <!--<td>&nbsp;</td> -->
+                                <td style="padding-left: 50px;">
                                     <span data-bind="text: Name"></span>
-                                    <span>&nbsp;</span>
+                                </td>
+                                <td class="left">
                                     <span class="glyphicon glyphicon-pencil hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: renameTask.bind($data, TTaskID(), Name())" title="Rename Task"></span>
                                     <span class="glyphicon glyphicon-remove-circle hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: obsoleteTask.bind($data, TTaskID(), Name())" title="Delete Task"></span>
                                 </td>
@@ -362,12 +364,13 @@
             useCurrent: false
         });
 
+
         $("#EditEndDate").on("dp.change", function (e) {
             if (e.date != null) {
                 $('#EditStartDate').data("DateTimePicker").maxDate(e.date);
             }
             else {
-                $('#EditStartDate').data("DateTimePicker").maxDate();
+                $('#EditStartDate').data("DateTimePicker").maxDate(false);
             }
             editModel.Entry.EndDate(moment(e.date).toISOString());
             updateEditContrib();

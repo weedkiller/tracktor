@@ -201,6 +201,8 @@ var updateHomeModel = function (data) {
         ko.mapping.fromJS(data.ReportModel, {}, reportModel);
     }
     if (data.EditModel) {
+        $("#EditStartDate").data("DateTimePicker").maxDate(false);
+        $("#EditEndDate").data("DateTimePicker").minDate(false);
         $("#EditEndDate").data("DateTimePicker").date(null);
         ko.mapping.fromJS(data.EditModel, {}, editModel);
         // update datepickers
