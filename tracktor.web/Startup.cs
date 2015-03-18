@@ -24,7 +24,7 @@ namespace tracktor.web
     {
         public static ITracktorService Create()
         {
-            var httpBinding = new BasicHttpsBinding(BasicHttpsSecurityMode.TransportWithMessageCredential);
+            var httpBinding = new BasicHttpsBinding("BasicHttpsBinding_ITracktorService");
             var identity = new DnsEndpointIdentity("");
             var address = new EndpointAddress(new Uri(ConfigurationManager.AppSettings["ServiceUrl"]), identity, new AddressHeaderCollection());
             var factory = new ChannelFactory<ITracktorService>(httpBinding, address);

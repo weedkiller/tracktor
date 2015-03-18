@@ -36,27 +36,37 @@ namespace tracktor.web.Controllers
         [Authorize]
         public FileResult CSV()
         {
-            var context = TracktorController.GetContext(Request.GetOwinContext());
-            var entries = _service.GetEntriesModel(context, null, null, 0, 0, 99999);
-
-            var csvFile = new StringBuilder();
-            csvFile.AppendLine("Start,End,Project,Task,Hours,InProgress");
-            foreach(var entry in entries.Entries)
+            try
             {
-                csvFile.AppendLine(
-                    String.Format(
-                        "{0},{1},{2},{3},{4},{5}",
-                        entry.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
-                        entry.EndDate.HasValue ? entry.EndDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "",
-                        entry.ProjectName,
-                        entry.TaskName,
-                        (entry.Contrib / 3600).ToString(), // hours
-                        entry.InProgress ? "Yes" : "No"));
+                var context = TracktorController.GetContext(Request.GetOwinContext());
+                var entries = _service.GetEntriesModel(context, null, null, 0, 0, 99999);
+
+                var csvFile = new StringBuilder();
+                csvFile.AppendLine("Start,End,Project,Task,Hours,InProgress");
+                foreach (var entry in entries.Entries)
+                {
+                    csvFile.AppendLine(
+                        String.Format(
+                            "{0},{1},{2},{3},{4},{5}",
+                            entry.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            entry.EndDate.HasValue ? entry.EndDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "",
+                            entry.ProjectName,
+                            entry.TaskName,
+                            (entry.Contrib / 3600).ToString(), // hours
+                            entry.InProgress ? "Yes" : "No"));
+                }
+                return File(
+                    System.Text.Encoding.UTF8.GetBytes(csvFile.ToString()),
+                    "text/csv",
+                    string.Format("tracktor tasks {0}.csv", DateTime.UtcNow.ToString("yyyy-MM-dd")));
             }
-            return File(
-                System.Text.Encoding.UTF8.GetBytes(csvFile.ToString()),
-                "text/csv",
-                string.Format("tracktor tasks {0}.csv", DateTime.UtcNow.ToString("yyyy-MM-dd")));
+            catch (Exception ex)
+            {
+                return File(
+                    System.Text.Encoding.UTF8.GetBytes("Error: " + ex.Message),
+                    "text/plain",
+                    string.Format("error {0}.txt", DateTime.UtcNow.ToString("yyyy-MM-dd")));
+            }
         }
     }
 }
