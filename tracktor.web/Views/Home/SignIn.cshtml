@@ -18,7 +18,7 @@
                             <input type="password" class="form-control" name="password" id="password" placeholder="enter password" />
                         </div>
                         <input type="hidden" name="grant_type" value="password" />
-                        <button class="btn btn-success" onclick="signIn();" title="sign in" type="button" id="signinbutton">sign in</button>
+                        <button class="btn btn-success" onclick="Tracktor.signIn();" title="sign in" type="button" id="signinbutton">sign in</button>
                     </form>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                             </select>
                         </div>
 
-                        <button class="btn btn-primary" onclick="register();" title="register" type="button">register</button>
+                        <button class="btn btn-primary" onclick="Tracktor.register();" title="register" type="button">register</button>
                     </form>
                 </div>
             </div>
@@ -64,7 +64,7 @@
     @Scripts.Render("~/bundles/signin")
 
     <script type="text/javascript">
-        initializeDefinitions("@Url.Content("~")");
-        initializeControls();
+        Tracktor.initializeDefinitions("@Url.Content("~")");
+        Tracktor.initializeControls();
     </script>
 }
