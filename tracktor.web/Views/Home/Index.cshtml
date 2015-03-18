@@ -344,36 +344,8 @@
     @Scripts.Render("~/bundles/tracktor")
 
     <script type="text/javascript">
-        initializeModel("@Url.Content("~")");
-
-        $("#EditStartDate").datetimepicker({
-            format: 'DD/MM/YYYY HH:mm:ss',
-            sideBySide: true,
-            useCurrent: false
-        });
-
-        $("#EditStartDate").on("dp.change", function (e) {
-            $('#EditEndDate').data("DateTimePicker").minDate(e.date);
-            editModel.Entry.StartDate(moment(e.date).toISOString());
-            updateEditContrib();
-        });
-
-        $("#EditEndDate").datetimepicker({
-            format: 'DD/MM/YYYY HH:mm:ss',
-            sideBySide: true,
-            useCurrent: false
-        });
-
-
-        $("#EditEndDate").on("dp.change", function (e) {
-            if (e.date != null) {
-                $('#EditStartDate').data("DateTimePicker").maxDate(e.date);
-            }
-            else {
-                $('#EditStartDate').data("DateTimePicker").maxDate(false);
-            }
-            editModel.Entry.EndDate(moment(e.date).toISOString());
-            updateEditContrib();
-        });
+        initializeDefinitions("@Url.Content("~")");
+        initializeControls();
+        initializeModel();
     </script>
 }

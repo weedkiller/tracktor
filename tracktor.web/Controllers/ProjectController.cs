@@ -14,17 +14,18 @@ using tracktor.web.Models;
 namespace tracktor.web.Controllers
 {
     [Authorize]
-    public class TracktorController : TracktorControllerBase
+    public class ProjectController : TracktorControllerBase
     {
-        public TracktorController(ITracktorService service) : base(service)
+        public ProjectController(ITracktorService service)
+            : base(service)
         {
         }
 
-        [Route("viewmodel")]
-        [HttpGet]
-        public TracktorWebModel GetViewModel(bool updateOnly = false)
+        [Route("project/update")]
+        [HttpPost]
+        public TProjectDto Update(TProjectDto project)
         {
-            return GenerateWebModel(updateOnly);
+            return _service.UpdateProject(Context, project);
         }
     }
 }

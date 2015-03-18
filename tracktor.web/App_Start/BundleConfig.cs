@@ -8,23 +8,30 @@ namespace tracktor.web
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/base").Include(
-                        "~/Scripts/jquery-{version}.js",
-                        "~/Scripts/modernizr-*",
-                        "~/Scripts/bootstrap.js",
-                        "~/Scripts/bootbox.js",
-                        "~/Scripts/respond.js",
-                        "~/Scripts/moment.js",
-                        "~/Scripts/bootstrap-datetimepicker.min.js"));
+                        "~/scripts/jquery-{version}.js",
+                        "~/scripts/modernizr-*",
+                        "~/scripts/bootstrap.js",
+                        "~/scripts/bootbox.js",
+                        "~/scripts/respond.js",
+                        "~/scripts/moment.js",
+                        "~/scripts/bootstrap-datetimepicker.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/signin").Include(
+                        "~/scripts/app/definitions.js",
+                        "~/scripts/app/signin.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/tracktor").Include(
-                        "~/Scripts/knockout-{version}.js",
-                        "~/Scripts/knockout.mapping-latest.js",
-                        "~/Scripts/tracktor.js"));
+                        "~/scripts/knockout-{version}.js",
+                        "~/scripts/knockout.mapping-latest.js",
+                        "~/scripts/app/definitions.js",
+                        "~/scripts/app/helpers.js",
+                        "~/scripts/app/model.js",
+                        "~/scripts/app/tracktor.js"));
 
-            bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
-                      "~/Content/bootstrap-datetimepicker.min.css",
-                      "~/Content/site.css"));
+            bundles.Add(new StyleBundle("~/content/css").Include(
+                      "~/content/bootstrap.css",
+                      "~/content/bootstrap-datetimepicker.min.css",
+                      "~/content/site.css"));
         }
     }
 }

@@ -11,12 +11,19 @@ namespace tracktor.web
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.LowercaseUrls = true;
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                name: "SignIn",
+                url: "signin",
+                defaults: new { controller = "Home", action = "SignIn" }
+            );
+
+            routes.MapRoute(
+                name: "Home",
+                url: "{controller}/{action}",
+                defaults: new { controller = "Home", action = "Index" }
             );
         }
     }

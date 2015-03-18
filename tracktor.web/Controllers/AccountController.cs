@@ -22,7 +22,7 @@ using System.Configuration;
 namespace tracktor.web.Controllers
 {
     [Authorize]
-    [RoutePrefix("api/Account")]
+    [RoutePrefix("account")]
     public class AccountController : ApiController
     {
         private const string LocalLoginProvider = "Local";
@@ -70,7 +70,7 @@ namespace tracktor.web.Controllers
         }
 
         // POST api/Account/Logout
-        [Route("Logout")]
+        [Route("signout")]
         public IHttpActionResult Logout()
         {
             Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);

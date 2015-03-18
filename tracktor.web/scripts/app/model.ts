@@ -1,0 +1,129 @@
+﻿/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/knockout.mapping/knockout.mapping.d.ts" />
+/// <reference path="../typings/moment/moment.d.ts" />
+/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
+/// <reference path="../typings/bootstrap.v3.datetimepicker/bootstrap.v3.datetimepicker.d.ts" />
+/// <reference path="../typings/bootbox/bootbox.d.ts" />
+
+var summaryModel;
+var statusModel;
+var entriesModel;
+var reportModel;
+var editModel;
+
+var viewOptions = {
+    showObsolete: ko.observable(false)
+};
+
+var projectMapping = function (data: any) {
+    var self = this;
+    ko.mapping.fromJS(data, {}, this);
+    self.Contrib = {
+        Today: ko.pureComputed(function () {
+            return self.TTasks().reduce(function (pv, vc) {
+                return pv + vc.Contrib.Today();
+            }, 0);
+        }, self),
+        ThisWeek: ko.pureComputed(function () {
+            return self.TTasks().reduce(function (pv, vc) {
+                return pv + vc.Contrib.ThisWeek();
+            }, 0);
+        }, self),
+        ThisMonth: ko.pureComputed(function () {
+            return self.TTasks().reduce(function (pv, vc) {
+                return pv + vc.Contrib.ThisMonth();
+            }, 0);
+        }, self)
+    };
+};
+
+var rootModel = function (data) {
+    ko.mapping.fromJS(data, rootMapping, this);
+};
+
+var rootMapping = {
+    "Projects": {
+        create: function (options) {
+            return new projectMapping(options.data);
+        }
+    },
+    create: function (options) {
+        var viewModel = new rootModel(options.data);
+        viewModel.Contrib = {
+            Today: ko.pureComputed(function () {
+                return viewModel.Projects().reduce(function (pv, vc) {
+                    return pv + vc.Contrib.Today();
+                }, 0);
+            }, viewModel),
+            ThisWeek: ko.pureComputed(function () {
+                return viewModel.Projects().reduce(function (pv, vc) {
+                    return pv + vc.Contrib.ThisWeek();
+                }, 0);
+            }, viewModel),
+            ThisMonth: ko.pureComputed(function () {
+                return viewModel.Projects().reduce(function (pv, vc) {
+                    return pv + vc.Contrib.ThisMonth();
+                }, 0);
+            }, viewModel)
+        };
+        return viewModel;
+    }
+};
+
+var bindHomeModel = function (data) {
+    summaryModel = ko.mapping.fromJS(data.SummaryModel, rootMapping);
+    ko.applyBindings(summaryModel, document.getElementById("SummaryModel"));
+
+    statusModel = ko.mapping.fromJS(data.StatusModel);
+    ko.applyBindings(statusModel, document.getElementById("StatusModel"));
+
+    entriesModel = ko.mapping.fromJS(data.EntriesModel);
+    ko.applyBindings(entriesModel, document.getElementById("EntriesModel"));
+
+    reportModel = ko.mapping.fromJS(data.ReportModel);
+    ko.applyBindings(reportModel, document.getElementById("ReportModel"));
+
+    editModel = ko.mapping.fromJS(data.EditModel);
+    ko.applyBindings(editModel, document.getElementById("EditModel"));
+
+    updateTitle();
+    $(".curtain").removeClass("curtain");
+    $(".nocurtain").remove();
+    timerFunc();
+};
+
+var updateHomeModel = function (data) {
+    if (data.SummaryModel) {
+        ko.mapping.fromJS(data.SummaryModel, rootMapping, summaryModel);
+    }
+    if (data.StatusModel) {
+        ko.mapping.fromJS(data.StatusModel, {}, statusModel);
+        updateTitle();
+    }
+    if (data.EntriesModel) {
+        ko.mapping.fromJS(data.EntriesModel, {}, entriesModel);
+    }
+    if (data.ReportModel) {
+        ko.mapping.fromJS(data.ReportModel, {}, reportModel);
+    }
+    if (data.EditModel) {
+        $("#EditStartDate").data("DateTimePicker").maxDate(false);
+        $("#EditEndDate").data("DateTimePicker").minDate(false);
+        $("#EditEndDate").data("DateTimePicker").date(null);
+        ko.mapping.fromJS(data.EditModel, {}, editModel);
+        // update datepickers
+        $("#EditStartDate").data("DateTimePicker").date(moment(editModel.Entry.StartDate()));
+        if (editModel.Entry.EndDate() != null) {
+            $("#EditEndDate").data("DateTimePicker").date(moment(editModel.Entry.EndDate()));
+        }
+    }
+};
+
+var refreshModel = function () {
+    hideReport();
+    requestData("viewmodel", "GET", {}, updateHomeModel);
+};
+
+var initializeModel = function () {
+    requestData("viewmodel", "GET", {}, bindHomeModel);
+};

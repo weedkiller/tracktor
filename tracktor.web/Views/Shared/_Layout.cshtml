@@ -4,34 +4,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")
+    @Styles.Render("~/content/css")
 </head>
 <body>
     <div class="navbar navbar-default" style="margin-bottom: 0;">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("tracktor", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("tracktor", "index", "home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    @if (ViewBag.User != null)
-                    {
+                @if (ViewBag.User != null)
+                {
+                    <ul class="nav navbar-nav navbar-right">
                         <li><a href="#">@ViewBag.User</a></li>
                         <li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
-                    }
-                </ul>
+                    </ul>
+                }
             </div>
         </div>
     </div>
     <div class="container body-content">
         @RenderBody()
         <footer class="navbar-fixed-bottom" style="margin-left: 15px;">
-            <p>&copy; @DateTime.Now.Year - <a href="https://github.com/rohatsu/tracktor">tracktor</a></p>
+            <p>&copy; @DateTime.Now.Year - <a href="https://github.com/rohatsu/tracktor">tracktor</a> by <a href="https://www.rohatsu.com">rohatsu software studios</a></p>
         </footer>
     </div>
 
