@@ -62,8 +62,7 @@ namespace tracktor.service
 
         public TContribDto GetContrib()
         {
-            return new TContribDto()
-            {
+            return new TContribDto() {
                 Today = GetTotalContribBetween(EndDate, EndDate),
                 ThisWeek = GetTotalContribBetween(EndDate.StartOfWeek(DayOfWeek.Monday), EndDate),
                 ThisMonth = GetTotalContribBetween(new DateTime(EndDate.Year, EndDate.Month, 1), EndDate),

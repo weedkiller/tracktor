@@ -231,7 +231,7 @@ namespace tracktor.service
             try
             {
                 var calc = new TracktorCalculator(context, _db);
-                var entry = _db.TEntries.SingleOrDefault(e => e.TEntryID == entryID && e.TTask.TProject.TUserID == context.TUserID);
+                var entry = _db.TEntries.Single(e => e.TEntryID == entryID && e.TTask.TProject.TUserID == context.TUserID);
                 return calc.EnrichTEntry(null, entry);
             }
             catch (Exception ex)
@@ -277,8 +277,8 @@ namespace tracktor.service
                                     _db.SaveChanges();
                                 }
                             }
+                            return calculator.EnrichTEntry(null, existingEntry);
                         }
-                        return calculator.EnrichTEntry(null, existingEntry);
                     }
                 }
                 return null;
@@ -319,6 +319,11 @@ namespace tracktor.service
         {
             try
             {
+                var startTask = _db.TTasks.Single(t => t.TTaskID == newTaskID);
+                if (startTask.TProject.TUserID != context.TUserID)
+                {
+                    throw new Exception("Invalid Task ID.");
+                }
                 var states = new TracktorStates(context, _db);
                 states.Start(newTaskID);
             }
@@ -332,6 +337,11 @@ namespace tracktor.service
         {
             try
             {
+                var startTask = _db.TTasks.Single(t => t.TTaskID == newTaskID);
+                if (startTask.TProject.TUserID != context.TUserID)
+                {
+                    throw new Exception("Invalid Task ID.");
+                }
                 var states = new TracktorStates(context, _db);
                 states.Stop(currentTaskID);
                 states.Start(newTaskID);

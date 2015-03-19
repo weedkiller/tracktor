@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.service", "trackto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.web", "tracktor.web\tracktor.web.csproj", "{4586E8A5-08C0-4CE5-B093-623EDED4B79F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tracktor.tests", "tracktor.tests\tracktor.tests.csproj", "{B0EC9CF1-71B8-4F35-B985-5673C9ABEFEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4586E8A5-08C0-4CE5-B093-623EDED4B79F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4586E8A5-08C0-4CE5-B093-623EDED4B79F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4586E8A5-08C0-4CE5-B093-623EDED4B79F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0EC9CF1-71B8-4F35-B985-5673C9ABEFEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0EC9CF1-71B8-4F35-B985-5673C9ABEFEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0EC9CF1-71B8-4F35-B985-5673C9ABEFEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0EC9CF1-71B8-4F35-B985-5673C9ABEFEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
