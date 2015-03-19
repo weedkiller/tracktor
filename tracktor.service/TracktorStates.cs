@@ -1,4 +1,8 @@
-﻿using Stateless;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using Stateless;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +13,7 @@ using tracktor.model.DAL;
 
 namespace tracktor.service
 {
-    class TracktorStates
+    internal class TracktorStates
     {
         protected TContextDto mContext;
         protected StateMachine<TState, TTrigger> mStateMachine;
@@ -106,12 +110,14 @@ namespace tracktor.service
             {
                 var user = _db.TUsers.Where(u => u.TUserID == mContext.TUserID).Single();
                 user.LastTaskID = newTaskId;
-                _db.TEntries.Add(new TEntry {
+                _db.TEntries.Add(new TEntry
+                {
                     StartDate = DateTime.UtcNow,
                     EndDate = null,
                     TTaskID = newTaskId
                 });
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(String.Format("Error starting task {0} for user {1}: {2}", newTaskId, mContext.TUserID, ex.Message));
             }

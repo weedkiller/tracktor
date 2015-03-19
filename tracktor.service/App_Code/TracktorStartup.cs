@@ -1,4 +1,8 @@
-﻿using Autofac;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using Autofac;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -15,12 +19,14 @@ namespace tracktor.service
             Mapper.CreateMap<TProject, TProjectDto>().AfterMap((src, dst) =>
                 dst.InProgress = false);
 
-            Mapper.CreateMap<TTask, TTaskDto>().AfterMap((src, dst) => {
+            Mapper.CreateMap<TTask, TTaskDto>().AfterMap((src, dst) =>
+            {
                 dst.Contrib = new TContribDto { Today = 0, ThisWeek = 0, ThisMonth = 0 };
                 dst.InProgress = false;
             });
 
-            Mapper.CreateMap<TEntry, TEntryDto>().AfterMap((src, dst) => {
+            Mapper.CreateMap<TEntry, TEntryDto>().AfterMap((src, dst) =>
+            {
                 dst.Contrib = 0;
                 dst.InProgress = false;
                 dst.IsDeleted = false;

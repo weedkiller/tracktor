@@ -1,4 +1,8 @@
-﻿using AutoMapper;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +16,7 @@ namespace tracktor.service
 {
     public class TracktorCalculator
     {
-        private readonly static int MaxEntries = 99999;
+        private readonly static int s_maxEntries = 99999;
         private ITracktorContext _db;
 
         protected TContextDto mContext;
@@ -68,7 +72,7 @@ namespace tracktor.service
                             && !(e.StartDate > utcEnd))
                 .OrderByDescending(e => e.EndDate.HasValue ? e.EndDate.Value : e.StartDate)
                 .Skip(startNo)
-                .Take(maxEntries <= 0 ? MaxEntries : maxEntries).ToList();
+                .Take(maxEntries <= 0 ? s_maxEntries : maxEntries).ToList();
         }
 
         protected double BucketEntry(TEntry entry, TracktorReport report)

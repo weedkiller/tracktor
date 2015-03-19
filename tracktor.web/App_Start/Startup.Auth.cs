@@ -1,4 +1,8 @@
-﻿using System;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Identity;
@@ -28,9 +32,10 @@ namespace tracktor.web
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
-            app.UseCookieAuthentication(new CookieAuthenticationOptions() {
+            app.UseCookieAuthentication(new CookieAuthenticationOptions()
+            {
                 LoginPath = new PathString("/signin"),
-                ReturnUrlParameter = "returnurl"                 
+                ReturnUrlParameter = "returnurl"
             });
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 

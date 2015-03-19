@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("tracktor.model")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright \u00A9  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

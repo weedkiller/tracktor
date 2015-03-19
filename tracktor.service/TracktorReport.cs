@@ -1,4 +1,8 @@
-﻿using System;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -28,7 +32,7 @@ namespace tracktor.service
         public void AddContrib(DateTime day, int taskId, double amount)
         {
             //Debug.Assert(day.Kind == DateTimeKind.Local, "Day is not in local time!");
-            if(day < StartDate || day > EndDate)
+            if (day < StartDate || day > EndDate)
             {
                 return; // ignore
             }
@@ -58,7 +62,8 @@ namespace tracktor.service
 
         public TContribDto GetContrib()
         {
-            return new TContribDto() {
+            return new TContribDto()
+            {
                 Today = GetTotalContribBetween(EndDate, EndDate),
                 ThisWeek = GetTotalContribBetween(EndDate.StartOfWeek(DayOfWeek.Monday), EndDate),
                 ThisMonth = GetTotalContribBetween(new DateTime(EndDate.Year, EndDate.Month, 1), EndDate),

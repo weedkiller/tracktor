@@ -1,4 +1,8 @@
-﻿using System;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
@@ -62,7 +66,8 @@ namespace tracktor.web.Controllers
         {
             ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
 
-            return new UserInfoViewModel {
+            return new UserInfoViewModel
+            {
                 Email = User.Identity.GetUserName(),
                 HasRegistered = externalLogin == null,
                 LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
@@ -92,7 +97,8 @@ namespace tracktor.web.Controllers
 
             foreach (IdentityUserLogin linkedAccount in user.Logins)
             {
-                logins.Add(new UserLoginInfoViewModel {
+                logins.Add(new UserLoginInfoViewModel
+                {
                     LoginProvider = linkedAccount.LoginProvider,
                     ProviderKey = linkedAccount.ProviderKey
                 });
@@ -100,13 +106,15 @@ namespace tracktor.web.Controllers
 
             if (user.PasswordHash != null)
             {
-                logins.Add(new UserLoginInfoViewModel {
+                logins.Add(new UserLoginInfoViewModel
+                {
                     LoginProvider = LocalLoginProvider,
                     ProviderKey = user.UserName,
                 });
             }
 
-            return new ManageInfoViewModel {
+            return new ManageInfoViewModel
+            {
                 LocalLoginProvider = LocalLoginProvider,
                 Email = user.UserName,
                 TimeZone = user.TimeZone,
@@ -301,9 +309,11 @@ namespace tracktor.web.Controllers
 
             foreach (AuthenticationDescription description in descriptions)
             {
-                ExternalLoginViewModel login = new ExternalLoginViewModel {
+                ExternalLoginViewModel login = new ExternalLoginViewModel
+                {
                     Name = description.Caption,
-                    Url = Url.Route("ExternalLogin", new {
+                    Url = Url.Route("ExternalLogin", new
+                    {
                         provider = description.AuthenticationType,
                         response_type = "token",
                         client_id = Startup.PublicClientId,
@@ -328,7 +338,7 @@ namespace tracktor.web.Controllers
                 return BadRequest(ModelState);
             }
 
-            if(!string.Equals(model.Authorization, ConfigurationManager.AppSettings["AuthorizationCode"]))
+            if (!string.Equals(model.Authorization, ConfigurationManager.AppSettings["AuthorizationCode"]))
             {
                 return BadRequest("Incorrect Authorization Code.");
             }
@@ -345,7 +355,7 @@ namespace tracktor.web.Controllers
                     result = await UserManager.UpdateAsync(user);
                     if (!result.Succeeded)
                     {
-                        return GetErrorResult(result);                       
+                        return GetErrorResult(result);
                     }
                 }
                 catch (Exception ex)
@@ -481,7 +491,8 @@ namespace tracktor.web.Controllers
                     return null;
                 }
 
-                return new ExternalLoginData {
+                return new ExternalLoginData
+                {
                     LoginProvider = providerKeyClaim.Issuer,
                     ProviderKey = providerKeyClaim.Value,
                     UserName = identity.FindFirstValue(ClaimTypes.Name)
@@ -491,7 +502,7 @@ namespace tracktor.web.Controllers
 
         private static class RandomOAuthStateGenerator
         {
-            private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
+            private static RandomNumberGenerator s_random = new RNGCryptoServiceProvider();
 
             public static string Generate(int strengthInBits)
             {
@@ -505,7 +516,7 @@ namespace tracktor.web.Controllers
                 int strengthInBytes = strengthInBits / bitsPerByte;
 
                 byte[] data = new byte[strengthInBytes];
-                _random.GetBytes(data);
+                s_random.GetBytes(data);
                 return HttpServerUtility.UrlTokenEncode(data);
             }
         }

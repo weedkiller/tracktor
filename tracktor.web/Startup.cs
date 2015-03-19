@@ -1,4 +1,8 @@
-﻿using System;
+﻿// copyright (c) 2015 rohatsu software studios limited (www.rohatsu.com)
+// licensed under the apache license, version 2.0; see LICENSE for details
+// 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Owin;
@@ -43,7 +47,7 @@ namespace tracktor.web
         public void Configuration(IAppBuilder app)
         {
             // autofac
-            var builder = new ContainerBuilder();            
+            var builder = new ContainerBuilder();
             builder.RegisterControllers(typeof(WebApiApplication).Assembly);
             builder.Register<ITracktorService>((c, p) => TracktorServiceClient.Create()).InstancePerRequest();
             var config = GlobalConfiguration.Configuration;
