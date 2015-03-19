@@ -36,6 +36,7 @@ namespace tracktor.web.Providers
             if (user == null)
             {
                 context.SetError("invalid_grant", "The user name or password is incorrect.");
+                context.Response.StatusCode = 400;
                 return;
             }
 

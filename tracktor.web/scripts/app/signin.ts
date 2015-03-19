@@ -34,15 +34,23 @@ module Tracktor {
         $.ajax({
             type: "POST",
             url: _urlRoot + "token",
-            data: loginData
-        }).done(function (data: any) {
+            data: loginData,
+        }).done(function (data: any, status: string, xhr: JQueryXHR) {
             sessionStorage.setItem(_tokenKey, data.access_token);
             window.location.assign(_urlRoot);
         }).fail(function (data: any) {
-            bootbox.alert(data.responseJSON.error_description);
-            $("#signinbutton").prop("disabled", false);
+            authFailed(data);
         });
     };
+
+    export var authFailed = function (data) {
+        if (data) {
+            bootbox.alert(data.responseJSON.error_description);
+        } else {
+            bootbox.alert("Authentication failed.");
+        }
+        $("#signinbutton").prop("disabled", false);
+    }
 
     export var register = function () {
         var registerData = {

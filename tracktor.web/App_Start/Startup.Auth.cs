@@ -30,7 +30,7 @@ namespace tracktor.web
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
             app.UseCookieAuthentication(new CookieAuthenticationOptions() {
                 LoginPath = new PathString("/signin"),
-                ReturnUrlParameter = "returnurl"
+                ReturnUrlParameter = "returnurl"                 
             });
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
@@ -42,7 +42,7 @@ namespace tracktor.web
                 Provider = new ApplicationOAuthProvider(PublicClientId),
                 AuthorizeEndpointPath = new PathString("/api/account/externallogin"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(14),
-                AllowInsecureHttp = true
+                AllowInsecureHttp = false
             };
 
             // Enable the application to use bearer tokens to authenticate users
