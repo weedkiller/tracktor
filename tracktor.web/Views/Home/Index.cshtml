@@ -274,6 +274,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal" id="entryEditModal" tabindex="-1" role="dialog" aria-labelledby="entryEditModalLabel" aria-hidden="true">
         <div class="modal-dialog" id="EditModel">
             <div class="modal-content">
@@ -334,6 +335,42 @@
                     <button type="button" class="btn btn-sm btn-danger summarybutton" data-bind="click: Tracktor.deleteEntry.bind($data, null)" data-dismiss="modal">Delete</button>
                     <button type="button" class="btn btn-sm btn-success summarybutton" data-bind="click: Tracktor.saveEntry.bind($data, null)" data-dismiss="modal">Save</button>
                     <button type="button" class="btn btn-sm btn-primary summarybutton" data-bind="click: Tracktor.refreshModel.bind($data, null)" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="userEditModal" tabindex="-1" role="dialog" aria-labelledby="userEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="userEditModalLabel">user preferences</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="userEditForm" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="EditEmail">e-mail:</label>
+                            <div class="col-sm-9">
+                                <p id="EditEmail" class="form-control-static">@User.Identity.Name</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="EditTimeZone">time zone:</label>
+                            <div class="col-sm-9">
+                                <select name="TimeZone" id="EditTimeZone" class="form-control">
+                                    @foreach (TimeZoneInfo timezone in TimeZoneInfo.GetSystemTimeZones().OrderBy(p => p.BaseUtcOffset))
+                                    {
+                                        <option value="@timezone.Id" @(timezone.Id == ViewBag.Timezone ? "selected=\"selected\"" : "")>@timezone.DisplayName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" name="Email" value="@User.Identity.Name" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success summarybutton" onclick="Tracktor.updateUser();" data-dismiss="modal">Update</button>
+                    <button type="button" class="btn btn-sm btn-primary summarybutton" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>

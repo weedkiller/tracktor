@@ -22,6 +22,9 @@ namespace tracktor.web.Controllers
         {
             ViewBag.Title = "tracktor";
             ViewBag.User = Request.GetOwinContext().Authentication.User.Identity.Name;
+            int userID;
+            var timezone = TracktorController.GetUserTimezone(Request.GetOwinContext(), out userID);
+            ViewBag.Timezone = timezone.Id;
 
             return View();
         }

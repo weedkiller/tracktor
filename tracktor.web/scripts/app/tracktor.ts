@@ -60,7 +60,7 @@ module Tracktor {
         $(".reportcurtain").show();
     };
 
-    export  var hideReport = function () {
+    export var hideReport = function () {
         $(".reportcurtain").hide();
     };
 
@@ -315,4 +315,11 @@ module Tracktor {
             }
         }
     });
+
+    export var updateUser = function () {
+        hideReport();
+        requestData("user/update", "POST",
+            $("#userEditForm").serialize(),
+            updateHomeModel);
+    };
 };

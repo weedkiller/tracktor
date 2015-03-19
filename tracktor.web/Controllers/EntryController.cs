@@ -45,15 +45,5 @@ namespace tracktor.web.Controllers
                 }
             };
         }
-
-        /*
-        [HttpGet]
-        public TracktorWebModel GetEntriesModel(DateTime? startDate, DateTime? endDate, int projectID, int startNo, int maxEntries)
-        {
-            return new TracktorWebModel
-            {
-                EntriesModel = _service.GetEntriesModel(Context, startDate, endDate, projectID, startNo, maxEntries)
-            };
-        }*/
     }
 }

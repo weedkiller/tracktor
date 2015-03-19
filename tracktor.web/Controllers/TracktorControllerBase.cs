@@ -22,15 +22,23 @@ namespace tracktor.web.Controllers
             _service = service;
         }
 
-        public static TContextDto GetContext(IOwinContext owinContext)
+        public static TimeZoneInfo GetUserTimezone(IOwinContext owinContext, out int userID)
         {
-            var userID = Int32.Parse(owinContext.Authentication.User.FindFirst("TUserID").Value);
-            var user = owinContext.GetUserManager<ApplicationUserManager>().Users.Where(u => u.TUserID == userID).FirstOrDefault();
+            int _userID = Int32.Parse(owinContext.Authentication.User.FindFirst("TUserID").Value);
+            var user = owinContext.GetUserManager<ApplicationUserManager>().Users.Where(u => u.TUserID == _userID).FirstOrDefault();
             var userTimeZone = TimeZoneInfo.Utc;
             if (!string.IsNullOrWhiteSpace(user.TimeZone))
             {
                 userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone);
             }
+            userID = _userID;
+            return userTimeZone;
+        }
+
+        public static TContextDto GetContext(IOwinContext owinContext)
+        {
+            int userID;
+            var userTimeZone = GetUserTimezone(owinContext, out userID);
             return new TContextDto
             {
                 TUserID = userID,
