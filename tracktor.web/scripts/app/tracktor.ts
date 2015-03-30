@@ -262,7 +262,7 @@ module Tracktor {
             animate: false,
             callback: function (result) {
                 if (result) {
-                    requestData("project/update", "POST", {
+                    requestData("task/update", "POST", {
                         TTaskID: taskId,
                         Name: result
                     }, refreshModel);
@@ -282,7 +282,7 @@ module Tracktor {
 
         $("#EditStartDate").on("dp.change", function (e) {
             $("#EditEndDate").data("DateTimePicker").minDate(e.date);
-            editModel.Entry.StartDate(moment(e.date).toISOString());
+            editModel.Entry.StartDate(moment(e.date).format("YYYY-MM-DDTHH:mm:ss.SSS"));
             updateEditContrib();
         });
 
@@ -299,7 +299,7 @@ module Tracktor {
             } else {
                 $("#EditStartDate").data("DateTimePicker").maxDate(false);
             }
-            editModel.Entry.EndDate(moment(e.date).toISOString());
+            editModel.Entry.EndDate(moment(e.date).format("YYYY-MM-DDTHH:mm:ss.SSS"));
             updateEditContrib();
         });
     };

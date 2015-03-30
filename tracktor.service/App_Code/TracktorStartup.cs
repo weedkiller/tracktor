@@ -4,9 +4,11 @@
 
 using Autofac;
 using AutoMapper;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using tracktor.model.DAL;
 
@@ -38,6 +40,7 @@ namespace tracktor.service
         public static void ConfigureAutofac(ContainerBuilder builder)
         {
             builder.RegisterType<TracktorContext>().As<ITracktorContext>();
+            builder.Register<ILog>((c, p) => LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType)).SingleInstance();
         }
     }
 }

@@ -3,6 +3,7 @@
 // 
 
 using AutoMapper;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,10 +24,12 @@ namespace tracktor.service
     public class TracktorService : ITracktorService
     {
         private ITracktorContext _db;
+        private ILog _log;
 
-        public TracktorService(ITracktorContext db)
+        public TracktorService(ITracktorContext db, ILog log)
         {
             _db = db;
+            _log = log;
         }
 
         #region ITracktorService
