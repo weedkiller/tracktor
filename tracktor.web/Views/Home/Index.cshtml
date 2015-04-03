@@ -73,13 +73,13 @@
                         </thead>
                         <tbody>
                             <!-- ko foreach: Projects -->
-                            <tr class="active" data-bind="visible: (!IsObsolete() || Contrib.ThisMonth() > 0)">
+                            <tr class="active" @*data-bind="visible: (!IsObsolete() || Contrib.ThisMonth() > 0)"*@ data-bind="css: { obsoletep: IsObsolete() } ">
                                 <td>
                                     <span data-bind="text: Name"></span>
                                 </td>
                                 <td class="left">
                                     <span class="glyphicon glyphicon-pencil hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: Tracktor.renameProject.bind($data, TProjectID(), Name())" title="Rename Project"></span>
-                                    <span class="glyphicon glyphicon-remove-circle hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: Tracktor.obsoleteProject.bind($data, TProjectID(), Name())" title="Delete Project"></span>
+                                    <span class="glyphicon glyphicon-star hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: Tracktor.obsoleteProject.bind($data, TProjectID(), Name(), IsObsolete())" title="Toggle Obsolete"></span>
                                     <span class="glyphicon glyphicon-plus-sign hidingbutton" aria-hidden="true" style="color:#aaa;" data-bind="click: Tracktor.newTask.bind($data, TProjectID())" title="Create Task"></span>
                                 </td>
                                 <td class="center"><span data-bind="if: InProgress">Active</span></td>

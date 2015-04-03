@@ -221,16 +221,16 @@ module Tracktor {
         });
     };
 
-    export var obsoleteProject = function (projectId: number, projectName: string) {
+    export var obsoleteProject = function (projectId: number, projectName: string, isObsolete: boolean) {
         bootbox.confirm({
-            title: "Confirm project removal",
-            message: "Are you sure you'd like to remove project " + projectName + "?",
+            title: "Confirm toggle obsolete",
+            message: "Are you sure you'd like toggle project " + projectName + "?",
             animate: false,
             callback: function (result) {
                 if (result) {
                     requestData("project/update", "POST", {
                         TProjectID: projectId,
-                        IsObsolete: true
+                        IsObsolete: !isObsolete
                     }, refreshModel);
                 }
             }
