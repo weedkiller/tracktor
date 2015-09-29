@@ -56,7 +56,7 @@ namespace tracktor.service
             return null;
         }
 
-        public List<TEntry> GetEntries(DateTime? startDate, DateTime endDate, int projectID, int startNo = 0, int maxEntries = -1)
+        public List<TEntry> GetEntries(DateTime? startDate, DateTime endDate, int projectID, int taskID, int startNo = 0, int maxEntries = -1)
         {
             Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
             Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
@@ -67,7 +67,8 @@ namespace tracktor.service
             }
             DateTime? utcStart = ToUtc(startDate);
             DateTime? utcEnd = ToUtc(endDate);
-            return _db.TEntries.AsNoTracking().Where(e => (e.TTask.TProjectID == projectID || projectID == 0) && e.TTask.TProject.TUserID == mContext.TUserID)
+            return _db.TEntries.AsNoTracking().Where(e => (e.TTask.TProjectID == projectID || projectID == 0) && e.TTask.TProject.TUserID == mContext.TUserID &&
+                (taskID ==0 || e.TTaskID == taskID))
                 .Where(e => !(utcStart.HasValue && e.EndDate.HasValue && e.EndDate < utcStart)
                             && !(e.StartDate > utcEnd))
                 .OrderByDescending(e => e.EndDate.HasValue ? e.EndDate.Value : e.StartDate)
@@ -96,12 +97,12 @@ namespace tracktor.service
             return totalContrib;
         }
 
-        public TracktorReport GetReport(DateTime? startDate, DateTime endDate, int projectID)
+        public TracktorReport GetReport(DateTime? startDate, DateTime endDate, int projectID, int taskID)
         {
             Debug.Assert(!startDate.HasValue || startDate.Value.Kind != DateTimeKind.Utc, "Start Date should not be UTC!");
             Debug.Assert(endDate.Kind != DateTimeKind.Utc, "End Date should not be UTC!");
 
-            List<TEntry> entries = GetEntries(startDate, endDate, projectID);
+            List<TEntry> entries = GetEntries(startDate, endDate, projectID, taskID);
             var report = new TracktorReport(startDate, endDate.AddDays(-1));
             foreach (var entry in entries)
             {
@@ -178,7 +179,7 @@ namespace tracktor.service
             };
 
             var taskToProject = model.Projects.SelectMany(p => p.TTasks.Select(t => new KeyValuePair<int, int>(t.TTaskID, t.TProjectID))).ToDictionary(t => t.Key, p => p.Value);
-            List<TEntry> entries = GetEntries(startDate, endDate, 0);
+            List<TEntry> entries = GetEntries(startDate, endDate, 0, 0);
             foreach (var taskEntry in entries.GroupBy(e => e.TTaskID))
             {
                 if (taskToProject.ContainsKey(taskEntry.Key))

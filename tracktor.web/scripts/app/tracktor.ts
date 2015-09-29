@@ -146,7 +146,8 @@ module Tracktor {
         var data = {
             year: $("#ReportYear").val(),
             month: $("#ReportMonth").val(),
-            projectID: $("#ReportProject").val()
+            projectID: $("#ReportProject").val(),
+            taskID: $("#ReportTask").val(),
         };
         hideReport();
         requestData("report", "GET", data,

@@ -174,7 +174,7 @@
                 <div class="tabcontent" id="ReportModel">
                     <form class="form-inline row">
                         <div class=" center-block">
-                            <div class="col-xs-2 col-xs-offset-2">
+                            <div class="col-xs-2">
                                 <label for="ReportYear">Year</label>
                                 <select id="ReportYear" data-bind="options: Years, value: SelectedYear" class="form-control input-sm"></select>
                             </div>
@@ -183,8 +183,12 @@
                                 <select id="ReportMonth" data-bind="options: Months, value: SelectedMonth" class="form-control input-sm"></select>
                             </div>
                             <div class="col-xs-3">
-                                <label for="ReportYear">Project</label>
+                                <label for="ReportProject">Project</label>
                                 <select id="ReportProject" data-bind="options: Projects, optionsValue: 'Key', optionsText: 'Value'" class="form-control input-sm"></select>
+                            </div>
+                            <div class="col-xs-3">
+                                @*<label for="ReportTask">Task</label>*@
+                                <select id="ReportTask" data-bind="options: Tasks, optionsValue: 'Key', optionsText: 'Value'" class="form-control input-sm"></select>
                             </div>
                             <div class="col-xs-2">
                                 <button class="btn btn-sm btn-primary" data-bind="click: Tracktor.generateReport.bind($data)" type="button">

@@ -26,12 +26,12 @@ namespace tracktor.web.Controllers
 
         [Route("report")]
         [HttpGet]
-        public TracktorWebModel Get(int year, int month, int projectID)
+        public TracktorWebModel Get(int year, int month, int projectID, int taskID)
         {
             var summaryModel = _service.GetSummaryModel(Context);
             var startDate = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Local);
             var endDate = startDate.AddMonths(1);
-            var reportModel = _service.GetReportModel(Context, startDate, endDate, projectID);
+            var reportModel = _service.GetReportModel(Context, startDate, endDate, projectID, taskID);
             var webReport = WebReportModel.Create(summaryModel, startDate);
 
             var reportStart = startDate.StartOfWeek(DayOfWeek.Monday);
@@ -76,7 +76,7 @@ namespace tracktor.web.Controllers
                     TaskContribs = new List<WebReportTaskContrib>(),
                     Contrib = 0
                 };
-                foreach (var task in project.TTasks)
+                foreach (var task in project.TTasks.Where(t => taskID == 0 || t.TTaskID == taskID))
                 {
                     var taskContrib = new WebReportTaskContrib
                     {

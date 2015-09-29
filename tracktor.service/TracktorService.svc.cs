@@ -111,7 +111,7 @@ namespace tracktor.service
             try
             {
                 var calc = new TracktorCalculator(context, _db);
-                var entries = calc.GetEntries(startDate, calc.DateOrLocalNow(endDate), projectID, startNo, maxEntries);
+                var entries = calc.GetEntries(startDate, calc.DateOrLocalNow(endDate), projectID, 0, startNo, maxEntries);
                 return new TEntriesModelDto
                 {
                     Entries = calc.CalculateEntryContribs(entries, startDate, calc.DateOrLocalNow(endDate))
@@ -292,12 +292,12 @@ namespace tracktor.service
             }
         }
 
-        public TReportModelDto GetReportModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID)
+        public TReportModelDto GetReportModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int taskID)
         {
             try
             {
                 var calculator = new TracktorCalculator(context, _db);
-                return Mapper.Map<TReportModelDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID));
+                return Mapper.Map<TReportModelDto>(calculator.GetReport(startDate, calculator.DateOrLocalNow(endDate), projectID, taskID));
             }
             catch (Exception ex)
             {

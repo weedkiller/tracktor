@@ -49,14 +49,15 @@ namespace tracktor.web.Controllers
                 var entries = _service.GetEntriesModel(context, null, null, 0, 0, 99999);
 
                 var csvFile = new StringBuilder();
-                csvFile.AppendLine("Start,End,Project,Task,Hours,InProgress");
+                csvFile.AppendLine("Start,End,Month,Project,Task,Hours,InProgress");
                 foreach (var entry in entries.Entries)
                 {
                     csvFile.AppendLine(
                         String.Format(
-                            "{0},{1},{2},{3},{4},{5}",
+                            "{0},{1},{2},{3},{4},{5},{6}",
                             entry.StartDate.ToString("yyyy-MM-dd HH:mm:ss"),
                             entry.EndDate.HasValue ? entry.EndDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "",
+                            entry.StartDate.ToString("yyyy-MMM"),
                             entry.ProjectName,
                             entry.TaskName,
                             (entry.Contrib / 3600).ToString(), // hours

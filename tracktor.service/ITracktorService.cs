@@ -34,7 +34,7 @@ namespace tracktor.service
 
         [OperationContract]
         [WebInvoke(BodyStyle = WebMessageBodyStyle.Wrapped)]
-        TReportModelDto GetReportModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID);
+        TReportModelDto GetReportModel(TContextDto context, DateTime? startDate, DateTime? endDate, int projectID, int taskID);
 
         [OperationContract]
         [WebInvoke(BodyStyle = WebMessageBodyStyle.Wrapped)]

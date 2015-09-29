@@ -63,9 +63,12 @@ namespace tracktor.web.Models
         {
             var projects = new List<KeyValuePair<int, string>> { new KeyValuePair<int, string>(0, "(all)") };
             projects.AddRange(summaryModel.Projects.OrderBy(p => p.DisplayOrder).ThenBy(p => p.TProjectID).Select(p => new KeyValuePair<int, string>(p.TProjectID, p.Name)));
+            var tasks = new List<KeyValuePair<int, string>> { new KeyValuePair<int, string>(0, "(all)") };
+            tasks.AddRange(summaryModel.Projects.SelectMany(p => p.TTasks.Select(t => new { p, t})).Where(t => !t.t.IsObsolete).OrderBy(t => t.p.DisplayOrder).ThenBy(t => t.t.DisplayOrder).Select(t => new KeyValuePair<int, string>(t.t.TTaskID, String.Format("{0}.{1}", t.p.Name.Substring(0,3).ToUpper(), t.t.Name))));
             return new WebReportModel()
             {
                 Projects = projects,
+                Tasks = tasks,
                 Years = Enumerable.Range(2013, DateTime.Today.Year - 2012).ToList(),
                 Months = Enumerable.Range(1, 12).ToList(),
                 Report = new List<WebReportWeek>(),
@@ -76,6 +79,7 @@ namespace tracktor.web.Models
             };
         }
         public List<KeyValuePair<int, string>> Projects { get; set; }
+        public List<KeyValuePair<int, string>> Tasks { get; set; }
         public List<int> Years { get; set; }
         public List<int> Months { get; set; }
         public List<WebReportWeek> Report { get; set; }
