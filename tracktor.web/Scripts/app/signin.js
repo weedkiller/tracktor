@@ -1,58 +1,52 @@
-﻿/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="../typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../typings/moment/moment.d.ts" />
 /// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../typings/bootstrap.v3.datetimepicker/bootstrap.v3.datetimepicker.d.ts" />
 /// <reference path="../typings/bootbox/bootbox.d.ts" />
-
 /// <reference path="definitions.ts" />
-
-module Tracktor {
-    export var initializeControls = function () {
+var Tracktor;
+(function (Tracktor) {
+    Tracktor.initializeControls = function () {
         $("[data-toggle='tooltip']").tooltip();
-
-        $("#loginform").keyup(function (event: any) {
+        $("#loginform").keyup(function (event) {
             if (event.keyCode === 13) {
                 $("#signinbutton").click();
             }
         });
     };
-
-    export var internalSignIn = function (username: string, password: string) {
+    Tracktor.internalSignIn = function (username, password) {
         var loginData = {
             grant_type: "password",
             username: username,
             password: password
         };
-
         if (!loginData.username || !loginData.password) {
             bootbox.alert("Username and password cannot be empty.");
             return;
         }
-
         $("#signinbutton").prop("disabled", true);
         $.ajax({
             type: "POST",
-            url: _urlRoot + "token",
+            url: Tracktor._urlRoot + "token",
             data: loginData,
-        }).done(function (data: any, status: string, xhr: JQueryXHR) {
-            sessionStorage.setItem(_tokenKey, data.access_token);
-            window.location.assign(_urlRoot);
-        }).fail(function (data: any) {
-            authFailed(data);
+        }).done(function (data, status, xhr) {
+            sessionStorage.setItem(Tracktor._tokenKey, data.access_token);
+            window.location.assign(Tracktor._urlRoot);
+        }).fail(function (data) {
+            Tracktor.authFailed(data);
         });
     };
-
-    export var authFailed = function (data) {
+    Tracktor.authFailed = function (data) {
         if (data) {
             bootbox.alert({ message: data.responseJSON.error_description });
-        } else {
+        }
+        else {
             bootbox.alert("Authentication failed.");
         }
         $("#signinbutton").prop("disabled", false);
-    }
-
-    export var register = function () {
+    };
+    Tracktor.register = function () {
         var registerData = {
             Authorization: $("#Authorization").val(),
             Email: $("#RegisterEmail").val(),
@@ -60,7 +54,6 @@ module Tracktor {
             ConfirmPassword: $("#ConfirmPassword").val(),
             TimeZone: $("#TimeZone").val()
         };
-
         if (!registerData.Authorization || !registerData.Email || !registerData.Password || !registerData.ConfirmPassword) {
             bootbox.alert("Please fill in all fields on the registration form.");
             return;
@@ -69,15 +62,14 @@ module Tracktor {
             bootbox.alert("Password and confirmation don't match!");
             return;
         }
-
         $("#registerbutton").prop("disabled", true);
         $.ajax({
             type: "POST",
-            url: _urlRoot + "account/register",
+            url: Tracktor._urlRoot + "account/register",
             data: registerData
-        }).done(function (data: any) {
-            internalSignIn($("#RegisterEmail").val(), $("#RegisterPassword").val());
-        }).fail(function (data: any) {
+        }).done(function (data) {
+            Tracktor.internalSignIn($("#RegisterEmail").val(), $("#RegisterPassword").val());
+        }).fail(function (data) {
             var errors = "";
             var modelState = data.responseJSON.ModelState;
             if (modelState) {
@@ -90,14 +82,16 @@ module Tracktor {
                 }
                 bootbox.alert(errors);
                 $("#registerbutton").prop("disabled", false);
-            } else {
+            }
+            else {
                 bootbox.alert(data.responseJSON.Message);
                 $("#registerbutton").prop("disabled", false);
             }
         });
     };
-
-    export var signIn = function () {
-        internalSignIn($("#username").val(), $("#password").val());
+    Tracktor.signIn = function () {
+        Tracktor.internalSignIn($("#username").val(), $("#password").val());
     };
-};
+})(Tracktor || (Tracktor = {}));
+;
+//# sourceMappingURL=signin.js.map

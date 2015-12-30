@@ -298,7 +298,7 @@ module Tracktor {
             if (e.date != null) {
                 $("#EditStartDate").data("DateTimePicker").maxDate(e.date);
             } else {
-                $("#EditStartDate").data("DateTimePicker").maxDate(false);
+                $("#EditStartDate").data("DateTimePicker").maxDate(null);
             }
             editModel.Entry.EndDate(moment(e.date).format("YYYY-MM-DDTHH:mm:ss.SSS"));
             updateEditContrib();

@@ -35,7 +35,7 @@ namespace tracktor.tests
             AppDomain.CurrentDomain.SetData("DataDirectory", System.IO.Directory.GetCurrentDirectory());
             TracktorStartup.AppInitialize();
             _db = new TracktorContext();
-            _service = new TracktorService(_db);
+            _service = new TracktorService(_db, null);
             _userID = _db.TUsers.Single(u => u.Name == "guest").TUserID;
             _intruderUserID = _db.TUsers.Single(u => u.Name == "intruder").TUserID;
             _projectID_A = _db.TProjects.OrderBy(p => p.TProjectID).First(p => p.TUserID == _userID).TProjectID;
@@ -63,7 +63,7 @@ namespace tracktor.tests
         {
             Assert.IsNotNull(_service.GetEntriesModel(_requestUTC, null, null, 0, 0, 999));
             Assert.IsNotNull(_service.GetEntry(_requestUTC, _entryID_A));
-            Assert.IsNotNull(_service.GetReportModel(_requestUTC, null, null, 0));
+            Assert.IsNotNull(_service.GetReportModel(_requestUTC, null, null, 0, 0));
             Assert.IsNotNull(_service.GetStatusModel(_requestUTC));
             Assert.IsNotNull(_service.GetSummaryModel(_requestUTC));
         }
@@ -180,8 +180,8 @@ namespace tracktor.tests
             Assert.AreEqual(utcContrib.Today, 0);
             Assert.AreNotEqual(localContrib.Today, 0);
 
-            var reportUTC = _service.GetReportModel(_requestUTC, today.AddDays(-1), today.AddDays(1), project.TProjectID);
-            var reportLocal = _service.GetReportModel(_requestLocal, today.AddDays(-1), today.AddDays(1), project.TProjectID);
+            var reportUTC = _service.GetReportModel(_requestUTC, today.AddDays(-1), today.AddDays(1), project.TProjectID, 0);
+            var reportLocal = _service.GetReportModel(_requestLocal, today.AddDays(-1), today.AddDays(1), project.TProjectID, 0);
             Assert.AreEqual(reportUTC.DayContribs[today.AddDays(-1)], 1);
             Assert.AreEqual(reportLocal.DayContribs[today], 1);
             Assert.AreEqual(reportUTC.TaskContribs[task.TTaskID], 1);
