@@ -92,8 +92,8 @@ var Tracktor;
             ko.mapping.fromJS(data.ReportModel, {}, Tracktor.reportModel);
         }
         if (data.EditModel) {
-            $("#EditStartDate").data("DateTimePicker").maxDate(null);
-            $("#EditEndDate").data("DateTimePicker").minDate(null);
+            $("#EditStartDate").data("DateTimePicker").maxDate(new Date());
+            $("#EditEndDate").data("DateTimePicker").minDate(new Date(0));
             $("#EditEndDate").data("DateTimePicker").date(null);
             ko.mapping.fromJS(data.EditModel, {}, Tracktor.editModel);
             // update datepickers

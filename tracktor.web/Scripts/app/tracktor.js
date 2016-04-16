@@ -260,7 +260,7 @@ var Tracktor;
                 $("#EditStartDate").data("DateTimePicker").maxDate(e.date);
             }
             else {
-                $("#EditStartDate").data("DateTimePicker").maxDate(null);
+                $("#EditStartDate").data("DateTimePicker").maxDate(new Date());
             }
             Tracktor.editModel.Entry.EndDate(moment(e.date).format("YYYY-MM-DDTHH:mm:ss.SSS"));
             Tracktor.updateEditContrib();
