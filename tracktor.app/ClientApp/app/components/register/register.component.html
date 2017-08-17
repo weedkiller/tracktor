@@ -1,0 +1,28 @@
+<div class="col-md-3 tabcontent">
+    <form action="#" method="post" id="registerform">
+        <div class="form-group">
+            <label for="Authorization">authorization code:</label>&nbsp;<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" title="provided by the owner of this site"></span>
+            <input type="password" name="Authorization" id="Authorization" placeholder="enter authorization code" class="form-control" [(ngModel)]="newCode" />
+        </div>
+        <div class="form-group">
+            <label for="RegisterEmail">e-mail:</label>
+            <input type="text" name="Email" id="RegisterEmail" class="form-control" placeholder="enter e-mail" [(ngModel)]="newUser" />
+        </div>
+        <div class="form-group">
+            <label for="RegisterPassword">password:</label>
+            <input type="password" name="Password" id="RegisterPassword" class="form-control" placeholder="enter password" [(ngModel)]="newPassword" />
+        </div>
+        <div class="form-group">
+            <label for="ConfirmPassword">confirm password:</label>
+            <input type="password" name="ConfirmPassword" id="ConfirmPassword" class="form-control" placeholder="re-enter password" [(ngModel)]="repeatPassword" />
+        </div>
+        <div class="form-group">
+            <label for="TimeZone">time zone:</label>
+            <select name="TimeZone" id="EditTimeZone" class="form-control" [(ngModel)]="timeZone">
+                <option *ngFor="let timeZone of appService.appSettings.timeZones" [value]="timeZone.id">{{timeZone.displayName}}</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" (click)="register()" title="register" type="button">register</button>
+    </form>
+</div>

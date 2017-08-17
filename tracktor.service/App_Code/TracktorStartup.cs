@@ -3,6 +3,7 @@
 // 
 
 using Autofac;
+using Autofac.Integration.Wcf;
 using AutoMapper;
 using log4net;
 using System;
@@ -14,10 +15,18 @@ using tracktor.model.DAL;
 
 namespace tracktor.service
 {
-    public class TracktorStartup
+    public static class TracktorStartup
     {
         public static void AppInitialize()
         {
+            // autofac
+            var builder = new ContainerBuilder();
+            builder.RegisterType<TracktorService>();
+            builder.RegisterType<TracktorContext>().As<ITracktorContext>();
+            builder.Register<ILog>((c, p) => LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType)).SingleInstance();
+            var container = builder.Build();
+            AutofacHostFactory.Container = container;
+
             Mapper.CreateMap<TProject, TProjectDto>().AfterMap((src, dst) =>
                 dst.InProgress = false);
 

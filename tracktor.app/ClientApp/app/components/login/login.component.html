@@ -1,0 +1,14 @@
+    <div class="col-md-3 tabcontent">
+        <form action="#" method="post" id="loginform">
+            <div class="form-group">
+                <label for="username">e-mail:</label>
+                <input type="text" class="form-control" name="username" id="username" [(ngModel)]="currentUser" placeholder="enter e-mail" (keyup.enter)="login()" />
+            </div>
+            <div class="form-group">
+                <label for="password">password</label>
+                <input type="password" class="form-control" name="password" id="password" [(ngModel)]="currentPassword" placeholder="enter password" (keyup.enter)="login()"/>
+            </div>
+            <input type="hidden" name="grant_type" value="password" />
+            <button class="btn btn-success" (click)="login()" title="sign in" type="button" id="signinbutton">sign in</button>
+        </form>
+    </div>

@@ -1,0 +1,59 @@
+<div class="modal" id="entryEditModal" tabindex="-1" role="dialog" aria-labelledby="entryEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="EditModel">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" (click)="close()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="entryEditModalLabel">Edit Entry</h4>
+            </div>
+            <div class="modal-body">
+                <form id="entryEditForm" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="EditProject">Project:</label>
+                        <div class="col-sm-10">
+                            <p id="EditProject" class="form-control-static">{{appService.editModel!.entry.projectName}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="EditTask">Task:</label>
+                        <div class="col-sm-10">
+                            <p id="EditTask" class="form-control-static">{{appService.editModel!.entry.taskName}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="EditContrib">Contrib:</label>
+                        <div class="col-sm-10">
+                            <p id="EditContrib" class="form-control-static">{{appService.editModel!.entry.contrib | timeSpanFull}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="EditStart">Start:</label>
+                        <div class="col-sm-6">
+                            <div id="EditStartDate" class="input-group date">
+                                <input tracktor-datetimepicker class="form-control" [date]="startDate" [options]="startOptions" (onChange)="changeStart($event)" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="EditEnd">End:</label>
+                        <div class="col-sm-6">
+                            <div id="EditEndDate" class="input-group date">
+                                <input tracktor-datetimepicker class="form-control" [date]="endDate" [options]="endOptions" (onChange)="changeEnd($event)" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-danger summarybutton" (click)="delete()" data-dismiss="modal">Delete</button>
+                <button type="button" class="btn btn-sm btn-success summarybutton" (click)="save()" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-sm btn-primary summarybutton" (click)="close()" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

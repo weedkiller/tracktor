@@ -1,0 +1,79 @@
+<div class="tabcontent" *ngIf="appService.summaryModel">
+    <table class="table table-condensed table-hover" id="SummaryModel">
+        <thead>
+            <tr class="emphasis">
+                <th class="center" style="width: 400px;">
+                    Project / Task
+                </th>
+                <th class="left" style="width: 75px;">
+                    <span class="glyphicon glyphicon-plus-sign hidingbutton" aria-hidden="true" style="color:#aaa;" (click)="newProject()" title="Create Project"></span>
+                </th>
+                <th class="center" style="width: 100px;">Status</th>
+                <th class="center" style="width: 100px;">Today</th>
+                <th class="center" style="width: 100px;">Week</th>
+                <th class="center" style="width: 100px;">Month</th>
+                <th class="center" style="width: 100px;">&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-template ngFor let-project [ngForOf]="appService.summaryModel.projects">
+                <tr class="active" [ngClass]="{ 'obsoletep' : project.isObsolete }">
+                    <td>
+                        <span>{{project.name}}</span>
+                    </td>
+                    <td class="left">
+                        <span class="glyphicon glyphicon-pencil hidingbutton" aria-hidden="true" style="color:#aaa;" (click)="renameProject(project.tProjectID, project.name)" title="Rename Project"></span>
+                        <span class="glyphicon glyphicon-star hidingbutton" aria-hidden="true" style="color:#aaa;" (click)="obsoleteProject(project.tProjectID, project.name, project.isObsolete)" title="Toggle Obsolete"></span>
+                        <span class="glyphicon glyphicon-plus-sign hidingbutton" aria-hidden="true" style="color:#aaa;" (click)="newTask(project.tProjectID)"></span>
+                    </td>
+                    <td class="center"><span *ngIf="project.inProgress">Active</span></td>
+                    <td class="contrib"><span>{{contrib(project).today | timeSpan }}</span></td>
+                    <td class="contrib"><span>{{contrib(project).thisWeek | timeSpan }}</span></td>
+                    <td class="contrib"><span>{{contrib(project).thisMonth | timeSpan }}</span></td>
+                    <td class="center">&nbsp;</td>
+                </tr>
+                <ng-template ngFor let-task [ngForOf]="project.tTasks">
+                    <tr [ngClass]="{ 'success': task.inProgress, 'invisible': (task.isObsolete || project.isObsolete) && (!task.contrib || !task.contrib.thisMonth) }">
+                        <td style="padding-left: 50px;">
+                            <span>{{task.name}}</span>
+                        </td>
+                        <td class="left">
+                            <span class="glyphicon glyphicon-pencil hidingbutton" aria-hidden="true" style="color:#aaa;" (click)="renameTask(task.tTaskID, task.name)" title="Rename Task"></span>
+                            <span class="glyphicon glyphicon-remove-circle hidingbutton" aria-hidden="true" style="color:#aaa;" (click)="obsoleteTask(task.tTaskID, task.name)" title="Delete Task"></span>
+                        </td>
+                        <td class="center"><span *ngIf="task.inProgress">Active</span></td>
+                        <td class="contrib"><span>{{task.contrib.today | timeSpan }}</span></td>
+                        <td class="contrib"><span>{{task.contrib.thisWeek | timeSpan }}</span></td>
+                        <td class="contrib"><span>{{task.contrib.thisMonth | timeSpan }}</span></td>
+                        <td class="right" style="width: 100px;">
+                            <span *ngIf="task.inProgress">
+                                <button class="btn btn-xs btn-danger summarybutton" (click)="stop(task.tTaskID)">
+                                    <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>&nbsp;&nbsp;Stop&nbsp;&nbsp;
+                                </button>
+                            </span>
+                            <span *ngIf="!task.inProgress">
+                                <button *ngIf="appService.summaryModel.inProgress" class="btn btn-xs btn-success summarybutton" (click)="switch(task.tTaskID)">
+                                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>&nbsp;&nbsp;Switch&nbsp;&nbsp;
+                                </button>
+                                <button *ngIf="!appService.summaryModel.inProgress" class="btn btn-xs btn-success summarybutton" (click)="start(task.tTaskID)">
+                                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>&nbsp;&nbsp;Start&nbsp;&nbsp;
+                                </button>
+                            </span>
+                        </td>
+                    </tr>
+                </ng-template>
+            </ng-template>
+        </tbody>
+        <tbody>
+            <tr class="emphasis active">
+                <th>TOTAL</th>
+                <th>&nbsp;</th>
+                <th class="center">&nbsp;</th>
+                <th class="contrib">{{totalContrib().today | timeSpan }}</th>
+                <th class="contrib">{{totalContrib().thisWeek | timeSpan }}</th>
+                <th class="contrib">{{totalContrib().thisMonth | timeSpan }}</th>
+                <th class="center">&nbsp;</th>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,130 @@
+﻿html {
+    overflow-y: scroll;
+}
+
+body {
+    padding-top: 0;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.summarybutton {
+    width: 75px;
+}
+
+div.curtain {
+    display: none;
+}
+
+.contrib {
+    text-align: center;
+}
+
+.center {
+    text-align: center;
+}
+
+.tabcontent {
+    margin-top: 25px;
+}
+
+.topheader {
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    border-color: #ddd;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+th.reporthead {
+    text-align: center;
+    width: 90px;
+}
+
+th.reporttotal {
+    text-align: right;
+    width: 90px;
+    font-weight: bold;
+}
+
+th.weekend {
+    color: red;
+}
+
+td.reportcell {
+    text-align: right;
+}
+
+td.outoffocus {
+    color: #ccc;
+}
+
+span.reportcontrib {
+    color: #999;
+}
+
+table.reporttable {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.reportcurtain {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.reportsub {
+    padding-top: 10px;
+}
+
+.hidingbutton {
+    visibility: hidden;
+    cursor: pointer;
+}
+
+tr:hover .hidingbutton {
+    visibility: visible;
+}
+
+.modal-open[style] {
+    padding-right: 0 !important;
+}
+
+a:focus {
+    outline: 0 !important;
+}
+
+.obsoletep {
+    color: #999;
+}
+
+.invisible {
+    display: none;
+}
+
+/* default .loading styles, .loading should be invisible, opacity: 0, z-index: -1 */
+.loading {
+    opacity: 0;
+    /*transition: opacity .8s ease-in-out;*/
+    text-align: center;
+    padding: 20px;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: #fff;
+    z-index: -1;
+}
+/* .loading screen is visible when app is not bootstraped yet, .my-app is empty */
+tracktor-app:empty + .loading {
+    opacity: 1;
+    z-index: 100;
+}

@@ -1,0 +1,18 @@
+@*<tracktor-app asp-prerender-module="ClientApp/dist/main-server"></tracktor-app>*@
+<tracktor-app></tracktor-app>
+
+<div class="loading">
+    <p>Loading...</p>
+</div>
+
+<script src="~/dist/vendor.js" asp-append-version="true"></script>
+@section scripts {
+    <script type="text/javascript">
+        var APP_SETTINGS = {
+            baseUri: '@Url.Action("Index", "Home", null, this.Context.Request.Scheme).Trim('/')',
+            timeZones: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TimeZoneInfo.GetSystemTimeZones().OrderBy(p => p.BaseUtcOffset).Select(tz => new { id = tz.Id, displayName = tz.DisplayName })))
+        };
+    </script>
+
+    <script src="~/dist/main-client.js" asp-append-version="true"></script>
+}

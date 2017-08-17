@@ -1,0 +1,11 @@
+<div class="container">
+    <div class="navbar-header">
+        <a class="navbar-brand" [routerLink]="['/home']">tracktor</a>
+    </div>
+    <div class="navbar-collapse collapse">
+        <ul *ngIf="appService.currentUser" class="nav navbar-nav navbar-right">
+            <li><a href="#" (click)="user()">{{appService.currentUser}}</a></li>
+            <li><a href="#" (click)="logout()"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
+        </ul>
+    </div>
+</div>

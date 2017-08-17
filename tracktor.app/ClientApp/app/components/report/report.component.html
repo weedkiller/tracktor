@@ -1,0 +1,101 @@
+<div class="tabcontent" *ngIf="appService.reportModel">
+    <form class="form-inline row">
+        <div class=" center-block">
+            <div class="col-xs-2">
+                <label for="ReportYear">Year</label>
+                <select id="ReportYear" [(ngModel)]="appService.reportModel.selectedYear" class="form-control input-sm" name="selectedYear">
+                    <option *ngFor="let year of appService.reportModel.years" [ngValue]="year">{{year}}</option>
+                </select>
+            </div>
+            <div class="col-xs-2">
+                <label for="ReportYear">Month</label>
+                <select id="ReportMonth" [(ngModel)]="appService.reportModel.selectedMonth" class="form-control input-sm" name="selectedMonth">
+                    <option *ngFor="let month of appService.reportModel.months" [ngValue]="month">{{month}}</option>
+                </select>
+            </div>
+            <div class="col-xs-3">
+                <label for="ReportProject">Project</label>
+                <select id="ReportProject" [(ngModel)]="selectedProject" class="form-control input-sm" name="selectedProject">
+                    <option *ngFor="let project of appService.reportModel.projects" [value]="project.key">{{project.value}}</option>
+                </select>
+            </div>
+            <div class="col-xs-3">
+                <!--*<label for="ReportTask">Task</label>-->
+                <select id="ReportTask" [(ngModel)]="selectedTask" class="form-control input-sm" name="selectedTask">
+                    <option *ngFor="let task of appService.reportModel.tasks" [value]="task.key">{{task.value}}</option>
+                </select>
+            </div>
+            <div class="col-xs-2">
+                <button class="btn btn-sm btn-primary" (click)="generateReport()" type="button">
+                    <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>&nbsp;&nbsp;Generate&nbsp;&nbsp;
+                </button>
+            </div>
+        </div>
+    </form>
+    <hr />
+    <div *ngIf="appService.reportModel.report.length > 0">
+        <h4 class="reportsub">Monthly Report</h4>
+        <table class="table table-bordered reporttable">
+            <thead>
+                <tr>
+                    <th class="reporthead">Mon</th>
+                    <th class="reporthead">Tue</th>
+                    <th class="reporthead">Wed</th>
+                    <th class="reporthead">Thu</th>
+                    <th class="reporthead">Fri</th>
+                    <th class="reporthead weekend">Sat</th>
+                    <th class="reporthead weekend">Sun</th>
+                    <th class="reporthead">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let week of appService.reportModel.report">
+                    <ng-template ngFor let-day [ngForOf]="week.days">
+                        <td class="reportcell" [ngClass]="{ outoffocus: !day.inFocus }">
+                            <span>{{day.day}}</span><br />
+                            <span class="reportcontrib" [ngClass]="{ invisible: !day.contrib }">{{day.contrib | timeSpan}}</span>
+                        </td>
+                    </ng-template>
+                    <td class="reportcell">
+                        <span>&nbsp;</span><br />
+                        <span>{{week.contrib | timeSpan}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">&nbsp;</th>
+                    <th class="reporttotal">
+                        <span>&nbsp;</span><br />
+                        <span>{{appService.reportModel.contrib | timeSpan}}</span>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+        <h4 class="reportsub">Task Breakdown</h4>
+        <table class="table table-condensed table-hover reporttable">
+            <thead>
+                <tr class="emphasis">
+                    <th class="center" style="width: 100px;">Project</th>
+                    <th class="center" style="width: 350px;">Task</th>
+                    <th class="center" style="width: 100px;">Contrib</th>
+                </tr>
+            </thead>
+            <tbody *ngFor="let project of appService.reportModel.projectContribs">
+                <tr class="active">
+                    <td colspan="2">{{project.projectName}}</td>
+                    <td class="contrib"><span>{{project.contrib | timeSpan}}</span></td>
+                </tr>
+                <tr *ngFor="let task of project.taskContribs">
+                    <td>&nbsp;</td>
+                    <td>{{task.taskName}}</td>
+                    <td class="contrib"><span>{{task.contrib | timeSpan}}</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,1 +1,1 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="tracktor.service.TracktorService" CodeBehind="TracktorService.svc.cs" %>
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="tracktor.service.TracktorService, tracktor.service" CodeBehind="TracktorService.svc.cs"  Factory="Autofac.Integration.Wcf.AutofacServiceHostFactory, Autofac.Integration.Wcf" %>
